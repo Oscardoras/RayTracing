@@ -56,6 +56,10 @@ public:
 		return Vector(x / l, y / l, z / l);
 	}
 
+	inline static Vector random() {
+
+	}
+
 };
 
 inline Vector operator+(Vector const& u, Vector const& v) {
