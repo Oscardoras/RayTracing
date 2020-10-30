@@ -17,7 +17,6 @@ private:
 
 public:
 
-	virtual ~World();
 	virtual Color infiniteColor(Ray const& r) const = 0;
 
 	void isEmpty() {
@@ -32,9 +31,9 @@ public:
 		hittables.clear();
 	}
 
-	Color trace(Ray const& r, int remaningRays) {
+	Color trace(Ray const& r, int remaningRays, int maxDepth) {
 		for (const std::shared_ptr<Hittable> hittable : hittables) {
-			Hit hit = hittable->hit(r, 0, std::numeric_limits<double>::infinity(), remaningRays);
+			Hit hit = hittable->hit(this, r, 0, std::numeric_limits<double>::infinity(), remaningRays, maxDepth);
 			if (hit.hitten) return hit;
 		}
 
@@ -42,8 +41,6 @@ public:
 	}
 
 };
-
-World::~World() {}
 
 
 #endif

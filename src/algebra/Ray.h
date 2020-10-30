@@ -29,6 +29,7 @@ public:
 	bool hitten;
 
 	Hit(): Color(), hitten(false) {}
+	Hit(Color color): Color(color), hitten(true) {}
 	Hit(float r, float g, float b): Color(r, g, b), hitten(true) {}
 	inline friend bool operator==(bool const& b, Hit const& h);
 

@@ -22,9 +22,10 @@ public:
 	float ratio;
 	float focalLength;
 	int maxRayPerPixel;
+	int maxDepth;
 
-	Camera(std::shared_ptr<World> world, Point position, Vector direction, int resolution, float ratio, float focalLength, int maxRayPerPixel):
-		world(world), position(position), direction(direction), resolution(resolution), ratio(ratio), focalLength(focalLength), maxRayPerPixel(maxRayPerPixel) {}
+	Camera(std::shared_ptr<World> world, Point position, Vector direction, int resolution, float ratio, float focalLength, int maxRayPerPixel, int maxDepth):
+		world(world), position(position), direction(direction), resolution(resolution), ratio(ratio), focalLength(focalLength), maxRayPerPixel(maxRayPerPixel),  maxDepth(maxDepth) {}
 
 	void render(std::ostream &out) const {
 		const int height = resolution;
@@ -42,7 +43,7 @@ public:
 				float u = float(i) / (width-1);
 				float v = float(j) / (height-1);
 				Ray r(position, corner + u*horizontal + v*vertical - position);
-				writeColor(out, world->trace(r, maxRayPerPixel));
+				writeColor(out, world->trace(r, maxRayPerPixel, maxDepth));
 			}
 		}
 	}

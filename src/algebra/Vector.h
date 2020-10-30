@@ -57,7 +57,7 @@ public:
 	}
 
 	inline static Vector random() {
-
+		return Vector();
 	}
 
 };
