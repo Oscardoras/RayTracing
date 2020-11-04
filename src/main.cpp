@@ -33,7 +33,6 @@ std::shared_ptr<World> getLevel() {
 int main() {
 	std::ofstream stream("image.ppm");
 	if (stream) {
-		int p;
 		Camera cam(getLevel(), Point(0., 0., 1.), Vector(0., 0., 1.), 720, 16./9., 1.0, 50, 5);
 		cam.render(stream);
 
