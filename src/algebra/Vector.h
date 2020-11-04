@@ -2,6 +2,7 @@
 #define VECTOR_H_
 
 #include <cmath>
+#include "../MathUtils.cpp"
 
 
 class Vector {
@@ -56,8 +57,20 @@ public:
 		return Vector(x / l, y / l, z / l);
 	}
 
+	inline static Vector random(double min, double max) {
+		return Vector(random_double(), random_double(), random_double());
+	}
+
 	inline static Vector random() {
-		return Vector();
+		return random(0., 1.);
+	}
+
+	inline static Vector random_in_unit_sphere() {
+		while (true) {
+			Vector v = random(-1, 1);
+			if (v.lengthSquared() >= 1) continue;
+			return v;
+		}
 	}
 
 };

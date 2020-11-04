@@ -15,17 +15,17 @@ public:
 	Color(): r(0), g(0), b(0) {}
 	Color(float r, float g, float b): r(r), g(g), b(b) {}
 
-	inline Color& operator+=(Color const& v) {
-		r += v.r;
-		g += v.g;
-		b += v.b;
+	inline Color& operator+=(Color const& c) {
+		r += c.r;
+		g += c.g;
+		b += c.b;
 		return *this;
 	}
 
-	inline Color& operator-=(Color const& v) {
-		r -= v.r;
-		g -= v.g;
-		b -= v.b;
+	inline Color& operator-=(Color const& c) {
+		r -= c.r;
+		g -= c.g;
+		b -= c.b;
 		return *this;
 	}
 
@@ -33,6 +33,13 @@ public:
 		r *= t;
 		g *= t;
 		b *= t;
+		return *this;
+	}
+
+	inline Color& operator/=(float const& t) {
+		r /= t;
+		g /= t;
+		b /= t;
 		return *this;
 	}
 
@@ -52,6 +59,10 @@ inline Color operator*(float const& t, Color const& u) {
 
 inline Color operator*(Color const& u, float const& t) {
 	return t * u;
+}
+
+inline Color operator/(Color const& u, float const& t) {
+	return u * (1/t);
 }
 
 void writeColor(std::ostream &out, Color const& color) {

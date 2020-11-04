@@ -5,19 +5,22 @@
 #include "../algebra/Point.h"
 #include "../algebra/Vector.h"
 #include "Material.h"
+#include "../World.h"
 
 
-class Lambertian {
+class Lambertian: public Material {
 
 public:
 
 	Lambertian() : Material() {}
-	Color hit(Point point, Vector reflected, Vector faceDirection, int remaningRays, std::shared_ptr<World> world) {
-		int rr = remaningRays / 2;
-		Color color();
-		for (int i = 0; i < rr; i++) {
-			color += world->trace(Ray(point, Vector.random()), rr);
+	virtual Color hit(World* world, Point point, Vector reflected, Vector faceDirection, int remaningRays, int maxDepth) const {
+		Color color;
+		for (int i = 0; i < remaningRays; i++) {
+			Ray r(point, Vector::random_in_unit_sphere());
+			Color c = world->trace(r, 1, maxDepth-1);
+			color += c;
 		}
+		return 0.5*(color/remaningRays) + 0.5*Color();
 	}
 
 };

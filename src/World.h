@@ -32,12 +32,14 @@ public:
 	}
 
 	Color trace(Ray const& r, int remaningRays, int maxDepth) {
-		for (const std::shared_ptr<Hittable> hittable : hittables) {
-			Hit hit = hittable->hit(this, r, 0, std::numeric_limits<double>::infinity(), remaningRays, maxDepth);
-			if (hit.hitten) return hit;
-		}
+		if (maxDepth > 0) {
+			for (const std::shared_ptr<Hittable> hittable : hittables) {
+				Hit hit = hittable->hit(this, r, 0, std::numeric_limits<double>::infinity(), remaningRays, maxDepth);
+				if (hit.hitten) return hit;
+			}
 
-		return infiniteColor(r);
+			return infiniteColor(r);
+		} else return Color();
 	}
 
 };

@@ -9,7 +9,7 @@ class Material {
 
 public:
 
-	virtual Color hit(Point point, Vector reflected, Vector faceDirection, int remaningRays, int maxDepth) const = 0;
+	virtual Color hit(World* world, Point point, Vector reflected, Vector faceDirection, int remaningRays, int maxDepth) const = 0;
 
 };
 

@@ -8,6 +8,7 @@
 #include "algebra/Vector.h"
 #include "Camera.h"
 #include "hittables/Sphere.h"
+# include "materials/Lambertian.h"
 
 
 class Level: public World {
@@ -24,8 +25,8 @@ public:
 
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
-	level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5));
-	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100));
+	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>()));
+	level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5, std::make_shared<Lambertian>()));
 	return level;
 }
 
@@ -33,7 +34,7 @@ int main() {
 	std::ofstream stream("image.ppm");
 	if (stream) {
 		int p;
-		Camera cam(getLevel(), Point(0., 0., 1.), Vector(0., 0., 1.), 1080, 16./9., 1.0, 10, 5);
+		Camera cam(getLevel(), Point(0., 0., 1.), Vector(0., 0., 1.), 720, 16./9., 1.0, 50, 5);
 		cam.render(stream);
 
 	} else {
