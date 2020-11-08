@@ -17,7 +17,7 @@ public:
 
 	Sphere(Point center, float radius, std::shared_ptr<Material> material): Hittable(), center(center), radius(radius), material(material) {}
 
-	virtual Hit hit(World* world, Ray const& r, float const& tMin, float const& tMax, int remaningRays, int maxDepth) const {
+	virtual Hit hit(World const& world, Ray const& r, float const& tMin, float const& tMax, int remaningRays, int maxDepth) const {
 		Vector oc = r.origin - center;
 		float a = r.direction.lengthSquared();
 		float halfB = dot(oc, r.direction);
@@ -29,7 +29,7 @@ public:
 			float temp = (-halfB - root)/a;
 			if (temp > tMin && temp < tMax) {
 				Point point = r.at(temp);
-				return material->hit(world, point, r.direction, point-center, remaningRays, maxDepth);
+				return Hit(material->hit(world, point, r.direction, (point-center).unit(), remaningRays, maxDepth), temp);
 			}
 		}
 

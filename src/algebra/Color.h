@@ -66,9 +66,9 @@ inline Color operator/(Color const& u, float const& t) {
 }
 
 void writeColor(std::ostream &out, Color const& color) {
-    out << static_cast<int>(255.999 * color.r) << ' '
-        << static_cast<int>(255.999 * color.g) << ' '
-        << static_cast<int>(255.999 * color.b) << '\n';
+    out << static_cast<int>(255. * color.r) << ' '
+        << static_cast<int>(255. * color.g) << ' '
+        << static_cast<int>(255. * color.b) << '\n';
 }
 
 

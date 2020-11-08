@@ -1,6 +1,9 @@
 #ifndef RAY_H_
 #define RAY_H_
 
+#include <cmath>
+#include <limits>
+
 #include "Color.h"
 #include "Point.h"
 #include "Vector.h"
@@ -26,12 +29,15 @@ class Hit: public Color {
 
 public:
 
-	bool hitten;
+	float t;
 
-	Hit(): Color(), hitten(false) {}
-	Hit(Color color): Color(color), hitten(true) {}
-	Hit(float r, float g, float b): Color(r, g, b), hitten(true) {}
-	inline friend bool operator==(bool const& b, Hit const& h);
+	Hit(): Color(), t(std::numeric_limits<double>::signaling_NaN()) {}
+	Hit(Color color, float t): Color(color), t(t) {}
+	Hit(float r, float g, float b, float t): Color(r, g, b), t(t) {}
+
+	inline bool hitten() const {
+		return !std::isnan(t);
+	}
 
 };
 

@@ -9,7 +9,7 @@ class Hittable {
 
 public:
 
-	virtual Hit hit(World* world, Ray const& r, float const& tMin, float const& tMax, int remaningRays, int maxDepth) const = 0;
+	virtual Hit hit(World const& world, Ray const& r, float const& tMin, float const& tMax, int remaningRays, int maxDepth) const = 0;
 
 };
 

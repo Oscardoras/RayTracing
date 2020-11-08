@@ -8,7 +8,7 @@
             "name": "g++ - Générer et déboguer le fichier actif",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "program": "${workspaceFolder}/src/main",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -4,6 +4,7 @@
 #include <limits>
 #include <memory>
 #include <vector>
+#include <cmath>
 
 #include "algebra/Ray.h"
 #include "hittables/Hittable.h"
@@ -31,14 +32,17 @@ public:
 		hittables.clear();
 	}
 
-	Color trace(Ray const& r, int remaningRays, int maxDepth) {
+	Color trace(Ray const& r, int remaningRays, int maxDepth) const {
 		if (maxDepth > 0) {
+			Hit mainHit = Hit();
 			for (const std::shared_ptr<Hittable> hittable : hittables) {
-				Hit hit = hittable->hit(this, r, 0, std::numeric_limits<double>::infinity(), remaningRays, maxDepth);
-				if (hit.hitten) return hit;
+				Hit hit = hittable->hit(*this, r, 0, std::numeric_limits<double>::infinity(), remaningRays, maxDepth);
+				if (hit.hitten() && (!mainHit.hitten() || hit.t < mainHit.t)) mainHit = hit;
 			}
 
-			return infiniteColor(r);
+			if (mainHit.hitten()) return mainHit;
+			else return infiniteColor(r);
+
 		} else return Color();
 	}
 
