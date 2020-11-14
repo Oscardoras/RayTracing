@@ -4,9 +4,9 @@
 #include <cmath>
 #include <limits>
 
-#include "Color.h"
-#include "Point.h"
-#include "Vector.h"
+#include "Color.hpp"
+#include "Point.hpp"
+#include "Vector.hpp"
 
 
 class Ray {
@@ -17,9 +17,9 @@ public:
 	const Vector direction;
 
 	Ray() {}
-	Ray(Point const& origin, Vector const& direction): origin(origin), direction(direction) {}
+	Ray(Point const origin, Vector const direction): origin(origin), direction(direction) {}
 
-	inline Point at(float const& t) const {
+	inline Point at(float const t) const {
 		return origin + t*direction;
 	}
 

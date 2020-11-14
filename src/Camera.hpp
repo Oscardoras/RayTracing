@@ -2,13 +2,10 @@
 #define CAMERA_H_
 
 #include <iostream>
+#include <algorithm>
 #include <memory>
 
-#include "algebra/Color.h"
-#include "algebra/Point.h"
-#include "algebra/Ray.h"
-#include "algebra/Vector.h"
-#include "World.h"
+#include "World.hpp"
 
 
 class Camera {
@@ -43,7 +40,13 @@ public:
 				float u = float(i) / (width-1);
 				float v = float(j) / (height-1);
 				Ray r(position, corner + u*horizontal + v*vertical - position);
-				writeColor(out, world->trace(r, maxRayPerPixel, maxDepth));
+				Color color = world->trace(r, maxRayPerPixel, maxDepth);
+				float max = 1.;
+				if (color.r > max) max = color.r;
+				if (color.g > max) max = color.g;
+				if (color.b > max) max = color.b;
+				if (max > 1.) color /= max;
+				writeColor(out, color);
 			}
 		}
 	}

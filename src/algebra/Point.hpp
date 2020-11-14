@@ -1,7 +1,7 @@
 #ifndef POINT_H_
 #define POINT_H_
 
-#include "Vector.h"
+#include "Vector.hpp"
 
 
 class Point {

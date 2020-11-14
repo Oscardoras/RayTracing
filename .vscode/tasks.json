@@ -8,7 +8,7 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${workspaceFolder}/src/main"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

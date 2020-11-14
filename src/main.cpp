@@ -2,15 +2,11 @@
 #include <fstream>
 #include <memory>
 
-#include "algebra/Color.h"
-#include "algebra/Point.h"
-#include "algebra/Ray.h"
-#include "algebra/Vector.h"
-#include "Camera.h"
-#include "hittables/Sphere.h"
-# include "materials/Lambertian.h"
-# include "materials/Metal.h"
-# include "materials/Light.h"
+#include "Camera.hpp"
+#include "hittables/Sphere.hpp"
+# include "materials/Lambertian.hpp"
+# include "materials/Metal.hpp"
+# include "materials/Light.hpp"
 
 
 class Level: public World {
@@ -20,7 +16,7 @@ public:
 	Color infiniteColor(Ray const& r) const {
 		Vector unit_direction = r.direction.unit();
 		float t = 0.5*(unit_direction.y + 1.0);
-		//return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(1.0, 0.8, 0.);
+		return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(1.5, 1., 0.1);
 		return Color();
 	}
 
@@ -28,9 +24,8 @@ public:
 
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
-	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(Color(1., 1., 1.))));
-	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Metal>(Color(1., 1., 1.))));
-	level->add(std::make_shared<Sphere>(Point(0,0,0.5), 0.5, std::make_shared<Light>(Color(1., 1., 1.))));
+	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5))));
+	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Metal>(Color(0., 0., 1.))));
 	return level;
 }
 

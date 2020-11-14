@@ -1,12 +1,11 @@
 #ifndef HITTABLES_SPHERE_H_
 #define HITTABLES_SPHERE_H_
 
+#include <memory>
 #include <algorithm>
 
-#include "../algebra/Point.h"
-#include "../algebra/Ray.h"
-#include "Hittable.h"
-#include "../materials/Material.h"
+#include "Hittable.hpp"
+#include "../materials/Material.hpp"
 
 
 class Sphere: public Hittable {
@@ -19,7 +18,7 @@ public:
 
 	Sphere(Point center, float radius, std::shared_ptr<Material> material): Hittable(), center(center), radius(radius), material(material) {}
 
-	virtual Hit hit(World const& world, Ray const& r, float const& tMin, float const& tMax, int remaningRays, int maxDepth) const {
+	virtual Hit hit(World const& world, Ray const& r, float const& tMin, float const& tMax, int const& remaningRays, int const& maxDepth) const {
 		Vector oc = r.origin - center;
 		float a = r.direction.lengthSquared();
 		float halfB = dot(oc, r.direction);

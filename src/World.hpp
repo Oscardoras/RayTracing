@@ -6,8 +6,8 @@
 #include <vector>
 #include <cmath>
 
-#include "algebra/Ray.h"
-#include "hittables/Hittable.h"
+#include "algebra/Ray.hpp"
+#include "hittables/Hittable.hpp"
 
 
 class World {
@@ -32,7 +32,7 @@ public:
 		hittables.clear();
 	}
 
-	Color trace(Ray const& r, int remaningRays, int maxDepth) const {
+	Color trace(Ray const& r, int const& remaningRays, int const& maxDepth) const {
 		if (maxDepth > 0) {
 			Hit mainHit = Hit();
 			for (const std::shared_ptr<Hittable> hittable : hittables) {

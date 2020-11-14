@@ -59,32 +59,32 @@ public:
 
 };
 
-inline Color operator+(Color const& u, Color const& v) {
-	return Color(u.r + v.r, u.g + v.g, u.b + v.b);
+inline Color operator+(Color const& c, Color const& d) {
+	return Color(c.r + d.r, c.g + d.g, c.b + d.b);
 }
 
-inline Color operator-(Color const& u, Color const& v) {
-	return Color(u.r - v.r, u.g - v.g, u.b - v.b);
+inline Color operator-(Color const& c, Color const& d) {
+	return Color(c.r - d.r, c.g - d.g, c.b - d.b);
 }
 
-inline Color operator*(float const& t, Color const& u) {
-	return Color(t * u.r, t * u.g, t * u.b);
+inline Color operator*(float const& t, Color const& c) {
+	return Color(t * c.r, t * c.g, t * c.b);
 }
 
-inline Color operator*(Color const& u, float const& t) {
-	return t * u;
+inline Color operator*(Color const& c, float const& t) {
+	return t * c;
 }
 
-inline Color operator*(Color const& u, Color const& v) {
-	return Color(u.r * v.r, u.g * v.g, u.b * v.b);
+inline Color operator*(Color const& c, Color const& d) {
+	return Color(c.r * d.r, c.g * d.g, c.b * d.b);
 }
 
-inline Color operator/(Color const& u, float const& t) {
-	return u * (1/t);
+inline Color operator/(Color const& c, float const& t) {
+	return c * (1/t);
 }
 
-inline Color operator/(Color const& u, Color const& v) {
-	return Color(u.r / v.r, u.g / v.g, u.b / v.b);
+inline Color operator/(Color const& c, Color const& d) {
+	return Color(c.r / d.r, c.g / d.g, c.b / d.b);
 }
 
 void writeColor(std::ostream &out, Color const& color) {
