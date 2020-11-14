@@ -58,19 +58,11 @@ public:
 	}
 
 	inline static Vector random(double min, double max) {
-		return Vector(random_double(), random_double(), random_double());
+		return Vector(random_double(min, max), random_double(min, max), random_double(min, max));
 	}
 
 	inline static Vector random() {
-		return random(0., 1.);
-	}
-
-	inline static Vector random_in_unit_sphere() {
-		while (true) {
-			Vector v = random(-1, 1);
-			if (v.lengthSquared() >= 1) continue;
-			return v;
-		}
+		return random(-1., 1.);
 	}
 
 };

@@ -1,6 +1,8 @@
 #ifndef HITTABLES_SPHERE_H_
 #define HITTABLES_SPHERE_H_
 
+#include <algorithm>
+
 #include "../algebra/Point.h"
 #include "../algebra/Ray.h"
 #include "Hittable.h"
@@ -26,7 +28,9 @@ public:
 
 		if (discriminant > 0) {
 			float root = sqrt(discriminant);
-			float temp = (-halfB - root)/a;
+			float temp1 = (-halfB - root)/a;
+			float temp2 = (-halfB + root)/a;
+			float temp = std::min(temp1, temp2);
 			if (temp > tMin && temp < tMax) {
 				Point point = r.at(temp);
 				return Hit(material->hit(world, point, r.direction, (point-center).unit(), remaningRays, maxDepth), temp);
