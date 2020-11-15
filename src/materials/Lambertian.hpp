@@ -16,7 +16,9 @@ public:
 		Color color;
 		Point p = point + 0.001*faceDirection;
 		for (int i = 0; i < remaningRays; i++) {
-			Ray r(p, Vector::random().unit());
+			Vector v = Vector::random().unit();
+			if (dot(v, faceDirection) < 0) v *= -1;
+			Ray r(p, v);
 			Color c = world.trace(r, 1, maxDepth-1);
 			color += c;
 		}
