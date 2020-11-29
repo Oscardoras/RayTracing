@@ -16,23 +16,24 @@ public:
 	std::shared_ptr<World> world;
 	Point position;
 	Vector direction;
+	Vector top;
 	int resolution;
 	float ratio;
-	float focalLength;
 	float gamma;
 	int maxRayPerPixel;
 	int maxDepth;
 
-	Camera(std::shared_ptr<World> world, Point position, Vector direction, int resolution, float ratio, float focalLength, float gamma, int maxRayPerPixel, int maxDepth):
-		world(world), position(position), direction(direction), resolution(resolution), ratio(ratio), focalLength(focalLength), gamma(gamma), maxRayPerPixel(maxRayPerPixel),  maxDepth(maxDepth) {}
+	Camera(std::shared_ptr<World> world, Point position, Vector direction, Vector top, int resolution, float ratio, float gamma, int maxRayPerPixel, int maxDepth):
+		world(world), position(position), direction(direction), top(top), resolution(resolution), ratio(ratio), gamma(gamma), maxRayPerPixel(maxRayPerPixel),  maxDepth(maxDepth) {}
 
 	void render(std::ostream &out) const {
 		const int height = resolution;
 		const int width = static_cast<int>(resolution * ratio);
 
-		Vector vertical = Vector(0.0, 1.0, 0.0);
-		Vector horizontal = Vector(ratio, 0.0, 0.0);
-		Point corner = position - horizontal/2 - vertical/2 - Vector(0, 0, focalLength);
+		Vector horizontal = cross(direction, top).unit();
+		Vector vertical = cross(horizontal, direction).unit();
+		horizontal *= ratio;
+		Point corner = position - horizontal/2 - vertical/2 + direction;
 
 		float g = 1/gamma;
 
