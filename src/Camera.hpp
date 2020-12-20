@@ -55,6 +55,7 @@ public:
 				if (color.g > max) max = color.g;
 				if (color.b > max) max = color.b;
 				if (max > 1.) color /= max;
+				
 				writeColor(out, color);
 			}
 		}

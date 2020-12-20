@@ -19,8 +19,7 @@ public:
 			Vector v = Vector::random().unit();
 			if (dot(v, faceDirection) < 0) v *= -1;
 			Ray r(p, v);
-			Color c = world.trace(r, 1, maxDepth-1);
-			color += c;
+			color += world.trace(r, 1, maxDepth-1);
 		}
 		return (color/remaningRays)*albedo;
 	}
