@@ -6,6 +6,7 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-g",
+                "-pthread",
                 "${file}",
                 "-o",
                 "${workspaceFolder}/src/main"
