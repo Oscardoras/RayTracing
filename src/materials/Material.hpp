@@ -1,7 +1,7 @@
 #ifndef MATERIALS_MATERIAL_H_
 #define MATERIALS_MATERIAL_H_
 
-#include "../algebra/Color.hpp"
+#include "../algebra/LightData.hpp"
 #include "../algebra/Point.hpp"
 
 
@@ -9,7 +9,7 @@ class Material {
 
 public:
 
-	virtual Color hit(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const = 0;
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const = 0;
 
 };
 

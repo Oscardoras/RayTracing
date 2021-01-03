@@ -12,16 +12,32 @@ public:
 	Color albedo;
 
 	Lambertian(Color albedo) : Material(), albedo(albedo) {}
-	virtual Color hit(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const {
-		Color color;
-		Point p = point + 0.001*faceDirection;
+	
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const override {
+		Color c;
+		Point p = point + 0.005*faceDirection;
 		for (int i = 0; i < remaningRays; i++) {
-			Vector v = Vector::random().unit();
-			if (dot(v, faceDirection) < 0) v *= -1;
-			Ray r(p, v);
-			color += world.trace(r, 1, maxDepth-1);
+			Vector v;
+			float pb;
+			if (!world.priorities.empty() && i < remaningRays*world.priority) {
+				std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
+				float radius  = priority->radius;
+				v = (priority->center + Vector::random()*radius) - p;
+				pb = ( (pi*radius*radius) / v.lengthSquared() ) / (4*pi*1*1);
+				if (dot(v, faceDirection) < 0) v *= -1;
+
+				v = v.unit();
+			} else {
+				v = Vector::randomUnit();
+				if (dot(v, faceDirection) < 0) v *= -1;
+				pb = 1;
+			}
+			LightData lightData = world.trace(Ray(p, v), 1, maxDepth-1);
+			c += lightData.light*lightData.albedo*pb;
 		}
-		return (color/remaningRays)*albedo;
+
+		Lambertian m = *this;
+		return LightData(albedo, c/remaningRays, &m);
 	}
 
 };

@@ -1,5 +1,5 @@
-#ifndef VECTOR_H_
-#define VECTOR_H_
+#ifndef ALGEBRA_VECTOR_H_
+#define ALGEBRA_VECTOR_H_
 
 #include <cmath>
 #include "../MathUtils.cpp"
@@ -63,6 +63,12 @@ public:
 
 	inline static Vector random() {
 		return random(-1., 1.);
+	}
+
+	inline static Vector randomUnit() {
+		Vector v = random(-1., 1.);
+		float l = 0.5 + v.lengthSquared()/2;
+		return Vector(v.x / l, v.y / l, v.z / l);
 	}
 
 };

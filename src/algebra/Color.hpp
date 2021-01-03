@@ -1,8 +1,5 @@
-#ifndef COLOR_H_
-#define COLOR_H_
-
-#include <iostream>
-#include <algorithm>
+#ifndef ALGEBRA_COLOR_H_
+#define ALGEBRA_COLOR_H_
 
 
 class Color {
@@ -86,12 +83,6 @@ inline Color operator/(Color const& c, float const& t) {
 
 inline Color operator/(Color const& c, Color const& d) {
 	return Color(c.r / d.r, c.g / d.g, c.b / d.b);
-}
-
-void writeColor(std::ostream &out, Color const& color) {
-    out << static_cast<int>(255. * std::max(float(0), color.r)) << ' '
-        << static_cast<int>(255. * std::max(float(0), color.g)) << ' '
-        << static_cast<int>(255. * std::max(float(0), color.b)) << '\n';
 }
 
 

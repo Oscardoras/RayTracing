@@ -1,7 +1,8 @@
-#ifndef HITTABLE_H_
-#define HITTABLE_H_
+#ifndef HITTABLES_HITTABLE_H_
+#define HITTABLES_HITTABLE_H_
 
 #include "../algebra/Ray.hpp"
+#include "../Image.hpp"
 
 class World;
 
@@ -9,7 +10,9 @@ class Hittable {
 
 public:
 
-	virtual Hit hit(World const& world, Ray const& r, float const& tMin, float const& tMax, int const& remaningRays, int const& maxDepth) const = 0;
+	virtual float hit(Ray const& r, float const& tMax) const = 0;
+
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, int const& remaningRays, int const& maxDepth) const = 0;
 
 };
 

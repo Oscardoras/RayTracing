@@ -50,5 +50,6 @@
         "ratio": "cpp",
         "mutex": "cpp",
         "thread": "cpp"
-    }
+    },
+    "C_Cpp.dimInactiveRegions": false
 }

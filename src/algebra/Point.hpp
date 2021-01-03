@@ -1,5 +1,5 @@
-#ifndef POINT_H_
-#define POINT_H_
+#ifndef ALGEBRA_POINT_H_
+#define ALGEBRA_POINT_H_
 
 #include "Vector.hpp"
 

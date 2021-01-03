@@ -15,7 +15,8 @@ public:
 	float refractive_index;
 
 	Dielectric(Color albedo, float refractive_index) : Material(), albedo(albedo), refractive_index(refractive_index) {}
-	virtual Color hit(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const {
+
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const override {
 		Color color;
 		Point p = point + 0.001*faceDirection;
 
@@ -34,12 +35,14 @@ public:
 		float sin_theta_1 = (n2/n1) * sqrt(1 - pow( dot(n, V2) / ( n.length() * V2.length() ) , 2) );
 		float cos_theta_1 = sqrt(1 - sin_theta_1*sin_theta_1);
 		Vector refract = cos_theta_1*n + sin_theta_1*t;
-		color += world.trace(Ray(p, refract), std::max(1, int(remaningRays/2)), maxDepth-1);
+		LightData lightData = world.trace(Ray(p, refract), std::max(1, int(remaningRays/2)), maxDepth-1);
+		color += lightData.light*lightData.albedo;
 
 		Vector reflect = (reflected - 2*dot(reflected, faceDirection)*faceDirection).unit();
 		//color += world.trace(Ray(p, reflect), std::max(1, int(remaningRays/2)), maxDepth-1);
 
-		return (color/2)*albedo;
+		Dielectric m = *this;
+		return LightData(albedo, color/2, &m);
 	}
 
 };

@@ -1,5 +1,5 @@
-#ifndef RAY_H_
-#define RAY_H_
+#ifndef ALGEBRA_RAY_H_
+#define ALGEBRA_RAY_H_
 
 #include <cmath>
 #include <limits>
@@ -21,22 +21,6 @@ public:
 
 	inline Point at(float const t) const {
 		return origin + t*direction;
-	}
-
-};
-
-class Hit: public Color {
-
-public:
-
-	float t;
-
-	Hit(): Color(), t(std::numeric_limits<double>::signaling_NaN()) {}
-	Hit(Color color, float t): Color(color), t(t) {}
-	Hit(float r, float g, float b, float t): Color(r, g, b), t(t) {}
-
-	inline bool hitten() const {
-		return !std::isnan(t);
 	}
 
 };
