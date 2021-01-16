@@ -18,7 +18,7 @@ public:
 	Color infiniteColor(Ray const& r) const {
 		Vector unit_direction = r.direction.unit();
 		float t = 0.5*(unit_direction.y + 1.0);
-		return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(0.5, 0.7, 1.0);
+		//return (1.0-t)*Color(1.0, 1.0, 1.0) + t*Color(0.5, 0.7, 1.0);
 		return Color();
 	}
 
@@ -29,8 +29,8 @@ std::shared_ptr<World> getLevel() {
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5))));
 	level->add(std::make_shared<Sphere>(Point(-1,0,0.5), 0.5, std::make_shared<Lambertian>(Color(1., 1., 0.))));
 	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Metal>(Color(1., 1., 1.), 0.)));
-	//level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5, std::make_shared<Light>(10.*Color(1., 1., 1.))));
-	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,-1), 0.5));
+	level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5, std::make_shared<Light>(10.*Color(1., 1., 1.))));
+	level->priorities.push_back(std::make_shared<Priority>(Point(0,0,-1), 0.5));
 	return level;
 }
 
@@ -66,30 +66,24 @@ std::shared_ptr<World> getLevel2() {
 }
 
 int main() {
-	int maxRayPerPixel = 15;
-	Point pos = Point(2., 0.5, -2.);
+	int maxRayPerPixel = 50;
+	Point pos = Point(4., 2, -2.);
 	Camera cam(getLevel(), pos, (Point(1,0,0.5) - pos).unit(), Vector(0,1,0), 720, 16./9.);
-	//cam.world->priority = 0.9;
+	cam.world->priority = 0.9;
 
-	Rendering rendering = cam.render(4, 3, maxRayPerPixel, 20);
+	Rendering rendering = cam.render(4, 1, maxRayPerPixel, 20);
 
-	rendering.light.median(5);
-	rendering.homogenize(6);
+	rendering.light.save("raw_light.ppm");
+	rendering.render(2.).save("raw.ppm");
+	std::cout << n << " rays" << std::endl;
+
+	rendering.homogenize(2, 7);
 
 	rendering.albedo.save("albedo.ppm");
 	rendering.light.save("light.ppm");
 
-	Image raw = rendering.render(2.);
-	raw.save("raw.ppm");
-
-	std::cout << n << " rays" << std::endl;
-
-	Image raw_contour(raw);
-	raw_contour.contour_detection5();
-	raw_contour.save("raw_contour.ppm");
-
-	Image image(raw);
-	image.smooth5();
+	Image image = rendering.render(2.);
+	image.smooth3();
 	image.save("image.ppm");
 
 	Image contour(image);

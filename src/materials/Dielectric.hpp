@@ -41,8 +41,7 @@ public:
 		Vector reflect = (reflected - 2*dot(reflected, faceDirection)*faceDirection).unit();
 		//color += world.trace(Ray(p, reflect), std::max(1, int(remaningRays/2)), maxDepth-1);
 
-		Dielectric m = *this;
-		return LightData(albedo, color/2, &m);
+		return LightData(albedo, color/2, long(this));
 	}
 
 };

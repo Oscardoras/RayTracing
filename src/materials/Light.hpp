@@ -14,7 +14,7 @@ public:
 	Light(Color albedo) : Material(), albedo(albedo) {}
 
 	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const override {
-		return LightData(albedo);
+		return LightData(albedo, long(this));
 	}
 
 };

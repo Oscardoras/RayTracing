@@ -188,30 +188,7 @@ public:
 						}
 					}
 				}
-
-				Color c;
-
-				int sr = vr.size();
-				if (sr > 0) {
-					std::sort(vr.begin(), vr.end());
-					if (sr % 2 == 0) c.r = (vr[(sr/2) - 1] + vr[sr/2]) / 2;
-					else c.r = vr[sr / 2];
-				}
-
-				int sg = vg.size();
-				if (sg > 0) {
-					std::sort(vg.begin(), vg.end());
-					if (sg % 2 == 0) c.g = (vg[(sg/2) - 1] + vg[sg/2]) / 2;
-					else c.g = vg[sg / 2];
-				}
-
-				int sb = vb.size();
-				if (sb > 0) {
-					std::sort(vb.begin(), vb.end());
-					if (sb % 2 == 0) c.b = (vb[(sb/2) - 1] + vb[sb/2]) / 2;
-					else c.b = vb[sb / 2];
-				}
-
+				
 				filtered[y][x] = Color(med(vr), med(vg), med(vb));
 			}
 		}

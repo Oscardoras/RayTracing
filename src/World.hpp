@@ -69,7 +69,7 @@ public:
 			}
 
 			if (std::isfinite(tMain)) return hittableMain->color(*this, r.at(tMain), r.direction, remaningRays, maxDepth);
-			else return LightData(infiniteColor(r));
+			else return LightData(infiniteColor(r), 0);
 
 		} else return LightData();
 	}

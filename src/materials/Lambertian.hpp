@@ -36,8 +36,7 @@ public:
 			c += lightData.light*lightData.albedo*pb;
 		}
 
-		Lambertian m = *this;
-		return LightData(albedo, c/remaningRays, &m);
+		return LightData(albedo, c/remaningRays, long(this));
 	}
 
 };
