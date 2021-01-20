@@ -27,8 +27,8 @@ public:
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5))));
-	level->add(std::make_shared<Sphere>(Point(-1,0,0.5), 0.5, std::make_shared<Lambertian>(Color(1., 1., 0.))));
-	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Metal>(Color(1., 1., 1.), 0.)));
+	level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Lambertian>(Color(1., 1., 0.))));
+	level->add(std::make_shared<Sphere>(Point(1,0.5,0.5), 1, std::make_shared<Metal>(Color(1., 1., 1.), 0.)));
 	//level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5, std::make_shared<Light>(10.*Color(1., 1., 1.))));
 	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,-1), 0.5));
 	return level;
@@ -67,7 +67,7 @@ std::shared_ptr<World> getLevel2() {
 
 int main() {
 	int maxRayPerPixel = 15;
-	Point pos = Point(4., 2, -2.);
+	Point pos = Point(4., 0.5, -2.);
 	Camera cam(getLevel(), pos, (Point(1,0,0.5) - pos).unit(), Vector(0,1,0), 720, 16./9.);
 	//cam.world->priority = 0.9;
 
@@ -77,7 +77,7 @@ int main() {
 	rendering.render(2.).save("raw.ppm");
 	std::cout << n << " rays" << std::endl;
 
-	rendering.homogenize(2, 5);
+	rendering.homogenize(3);
 
 	rendering.albedo.save("albedo.ppm");
 	rendering.light.save("light.ppm");
@@ -87,7 +87,7 @@ int main() {
 	image.save("image.ppm");
 
 	Image contour(image);
-	contour.contour_detection5();
+	contour.contour_detection();
 	contour.save("image_contour.ppm");
 
 	return 0;

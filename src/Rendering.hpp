@@ -44,67 +44,35 @@ public:
 		ids[y][x] = lightData.id;
 	}
 
-	void homogenize(int median, int blur) {
-		Color **medianed = new Color *[height];
-		for(int j = 0; j < height; j++) medianed[j] = new Color[width];
+	void homogenize(int size) {
+		Color **filtered = new Color *[height];
+		for(int j = 0; j < height; j++) filtered[j] = new Color[width];
 
-		int m = 1+2*median;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				long id = ids[y][x];
-				if (id != 0) {
-					std::vector<float> vr;
-					std::vector<float> vg;
-					std::vector<float> vb;
-
-					for (int j = 0; j < m; j++) {
-						for (int i = 0; i < m; i++) {
-							if (y-median+j >= 0 && y-median+j <= height-1 && x-median+i >= 0 && x-median+i <= width-1) {
-								if (ids[y-median+j][x-median+i] == id) {
-									Color c = light.pixels[y-median+j][x-median+i];
-									vr.push_back(c.r);
-									vg.push_back(c.g);
-									vb.push_back(c.b);
-								}
-							}
-						}
-					}
-					
-					medianed[y][x] = Color(med(vr), med(vg), med(vb));
-				} else medianed[y][x] = light.pixels[y][x];
-			}
-		}
-
-		Color **blured = new Color *[height];
-		for(int j = 0; j < height; j++) blured[j] = new Color[width];
-
-		int b = 1+2*blur;
+		int s = 1+2*size;
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				long id = ids[y][x];
 				if (id != 0) {
 					Color c;
 					int n = 0;
-					for (int j = 0; j < b; j++) {
-						for (int i = 0; i < b; i++) {
-							if (y-blur+j >= 0 && y-blur+j <= height-1 && x-blur+i >= 0 && x-blur+i <= width-1) {
-								if (ids[y-blur+j][x-blur+i] == id) {
-									c += medianed[y-blur+j][x-blur+i];
+					for (int j = 0; j < s; j++) {
+						for (int i = 0; i < s; i++) {
+							if (y-size+j >= 0 && y-size+j <= height-1 && x-size+i >= 0 && x-size+i <= width-1) {
+								if (ids[y-size+j][x-size+i] == id) {
+									c += light.pixels[y-size+j][x-size+i];
 									n++;
 								}
 							}
 						}
 					}
-					blured[y][x] = c/n;
-				} else blured[y][x] = medianed[y][x];
+					filtered[y][x] = c/n;
+				} else filtered[y][x] = light.pixels[y][x];
 			}
 		}
 
 		for(int j = 0; j < height; j++) delete light.pixels[j];
 		delete light.pixels;
-		for(int j = 0; j < height; j++) delete medianed[j];
-		delete medianed;
-		light.pixels = blured;
+		light.pixels = filtered;
 	}
 
 	Image render(float const& gamma) {
