@@ -44,7 +44,7 @@ public:
 		ids[y][x] = lightData.id;
 	}
 
-	void homogenize(int size) {
+	void homogenize(int size, float o) {
 		Color **filtered = new Color *[height];
 		for(int j = 0; j < height; j++) filtered[j] = new Color[width];
 
@@ -54,18 +54,21 @@ public:
 				long id = ids[y][x];
 				if (id != 0) {
 					Color c;
-					int n = 0;
-					for (int j = 0; j < s; j++) {
-						for (int i = 0; i < s; i++) {
-							if (y-size+j >= 0 && y-size+j <= height-1 && x-size+i >= 0 && x-size+i <= width-1) {
-								if (ids[y-size+j][x-size+i] == id) {
-									c += light.pixels[y-size+j][x-size+i];
-									n++;
+					float sum = 0.;
+					
+					for (int j = -size; j <= size; j++) {
+						for (int i = -size; i <= size; i++) {
+							if (y+j >= 0 && y+j <= height-1 && x+i >= 0 && x+i <= width-1) {
+								if (ids[y+j][x+i] == id) {
+									float coef = std::exp( -(i*i + j*j) / (2*o*o) ) / (2*pi*o*o);
+									sum += coef;
+									c += coef*light.pixels[y+j][x+i];
 								}
 							}
 						}
 					}
-					filtered[y][x] = c/n;
+
+					filtered[y][x] = c/sum;
 				} else filtered[y][x] = light.pixels[y][x];
 			}
 		}
