@@ -22,7 +22,7 @@ public:
 
 		float n1;
 		float n2;
-		if (dot(reflected, faceDirection) < 0.) {
+		if (reflected*faceDirection < 0.) {
 			n1 = refractive_index;
 			n2 = 1;
 		} else {
@@ -32,13 +32,13 @@ public:
 		Vector const& n = faceDirection;
 		Vector const& V2 = reflected;
 		Vector const& t = cross(n, cross(n, V2));
-		float sin_theta_1 = (n2/n1) * sqrt(1 - pow( dot(n, V2) / ( n.length() * V2.length() ) , 2) );
+		float sin_theta_1 = (n2/n1) * sqrt(1 - pow( n*V2 / ( n.length() * V2.length() ) , 2) );
 		float cos_theta_1 = sqrt(1 - sin_theta_1*sin_theta_1);
 		Vector refract = cos_theta_1*n + sin_theta_1*t;
 		LightData lightData = world.trace(Ray(p, refract), std::max(1, int(remaningRays/2)), maxDepth-1);
 		color += lightData.light*lightData.albedo;
 
-		Vector reflect = (reflected - 2*dot(reflected, faceDirection)*faceDirection).unit();
+		Vector reflect = (reflected - 2*(reflected*faceDirection)*faceDirection).unit();
 		//color += world.trace(Ray(p, reflect), std::max(1, int(remaningRays/2)), maxDepth-1);
 
 		return LightData(albedo, color/2, long(this));

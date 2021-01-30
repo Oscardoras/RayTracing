@@ -25,7 +25,7 @@ public:
 		int n = std::max(1, std::min(int(fuzziness * remaningRays), remaningRays));
 		int remaining = std::max(1, int(remaningRays / n));
 		for (int i = 0; i < n; i++) {
-			Vector d = (reflected - 2*dot(reflected, faceDirection)*faceDirection + fuzziness*Vector::random()).unit();
+			Vector d = (reflected - 2*(reflected*faceDirection)*faceDirection + fuzziness*Vector::random()).unit();
 			LightData lightData = world.trace(Ray(p, d), remaining, maxDepth-1);
 
 			albe += lightData.albedo;

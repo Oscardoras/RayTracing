@@ -6,6 +6,7 @@ int n = 0;
 #include "Camera.hpp"
 #include "hittables/Sphere.hpp"
 #include "hittables/Rectangle.hpp"
+#include "hittables/Triangle.hpp"
 #include "materials/Lambertian.hpp"
 #include "materials/Metal.hpp"
 #include "materials/Dielectric.hpp"
@@ -28,6 +29,8 @@ public:
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
+	level->add(std::make_shared<Rectangle>(-3.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(Color(0, 0, 0))));
+	//level->add(std::make_shared<Triangle>(Point(-1,0,-1), Point(1,0,-1), Point(1,0,0.5), std::make_shared<Lambertian>(Color(1, 1, 1))));
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(Color(0.5, 0.5, 0.5))));
 	level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Lambertian>(Color(1., 1., 0.))));
 	level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Lambertian>(Color(0., 1., 1.))));

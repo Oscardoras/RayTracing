@@ -89,15 +89,15 @@ inline Vector operator*(Vector const& u, float const& t) {
 	return t * u;
 }
 
+inline float operator*(Vector const& u, Vector const& v) {
+    return u.x * v.x + u.y * v.y + u.z * v.z;
+}
+
 inline Vector operator/(Vector const& u, float const& t) {
 	return (1/t) * u;
 }
 
-float dot(Vector const& u, Vector const& v) {
-    return u.x * v.x + u.y * v.y + u.z * v.z;
-}
-
-Vector cross(Vector const& u, Vector const& v) {
+inline Vector cross(Vector const& u, Vector const& v) {
     return Vector(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
 }
 

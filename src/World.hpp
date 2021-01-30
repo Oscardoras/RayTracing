@@ -23,7 +23,7 @@ public:
 	bool hit(Ray const& r) const {
 		Vector oc = r.origin - center;
 		float a = r.direction.lengthSquared();
-		float halfB = dot(oc, r.direction);
+		float halfB = oc*r.direction;
 		if (halfB < 0) {
 			float c = oc.lengthSquared() - radius*radius;
 			return halfB*halfB > a*c;

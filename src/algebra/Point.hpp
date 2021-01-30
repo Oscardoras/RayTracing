@@ -43,5 +43,17 @@ inline Vector operator-(Point const& a, Point const& b) {
 	return Vector(a.x - b.x, a.y - b.y, a.z - b.z);
 }
 
+inline float operator*(Point const& a, Point const& b) {
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline float operator*(Vector const& u, Point const& b) {
+    return u.x * b.x + u.y * b.y + u.z * b.z;
+}
+
+inline float operator*(Point const& a, Vector const& v) {
+    return a.x * v.x + a.y * v.y + a.z * v.z;
+}
+
 
 #endif

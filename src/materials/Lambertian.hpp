@@ -24,12 +24,12 @@ public:
 				float radius  = priority->radius;
 				v = (priority->center + Vector::random()*radius) - p;
 				pb = ( (pi*radius*radius) / v.lengthSquared() ) / (4*pi*1*1);
-				if (dot(v, faceDirection) < 0) v *= -1;
+				if (v*faceDirection < 0) v *= -1;
 
 				v = v.unit();
 			} else {
 				v = Vector::randomUnit();
-				if (dot(v, faceDirection) < 0) v *= -1;
+				if (v*faceDirection < 0) v *= -1;
 				pb = 1;
 			}
 			LightData lightData = world.trace(Ray(p, v), 1, maxDepth-1);
