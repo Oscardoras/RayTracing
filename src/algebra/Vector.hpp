@@ -53,6 +53,10 @@ public:
 	}
 
 	inline Vector unit() const {
+		/*float l2 = lengthSquared();
+		float l;
+		if (l2 <= 2.) l = 0.5 + l2/2;
+		else l = sqrt(l2);*/
 		float l = length();
 		return Vector(x / l, y / l, z / l);
 	}

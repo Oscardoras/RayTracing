@@ -15,14 +15,13 @@ public:
 	
 	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const override {
 		Color c;
-		Point p = point + 0.005*faceDirection;
 		for (int i = 0; i < remaningRays; i++) {
 			Vector v;
 			float pb;
 			if (!world.priorities.empty() && i < remaningRays*world.priority) {
 				std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
 				float radius  = priority->radius;
-				v = (priority->center + Vector::random()*radius) - p;
+				v = (priority->center + Vector::random()*radius) - point;
 				pb = ( (pi*radius*radius) / v.lengthSquared() ) / (4*pi*1*1);
 				if (v*faceDirection < 0) v *= -1;
 
@@ -32,7 +31,7 @@ public:
 				if (v*faceDirection < 0) v *= -1;
 				pb = 1;
 			}
-			LightData lightData = world.trace(Ray(p, v), 1, maxDepth-1);
+			LightData lightData = world.trace(Ray(point, v), 1, maxDepth-1);
 			c += lightData.light*lightData.albedo*pb;
 		}
 

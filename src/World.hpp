@@ -55,8 +55,9 @@ public:
 		hittables.clear();
 	}
 
-	LightData trace(Ray const& r, int const& remaningRays, int const& maxDepth) const {
-		n++;
+	LightData trace(Ray const& ray, int const& remaningRays, int const& maxDepth) const {
+		nbr++;
+		Ray r(ray.origin + ray.direction.unit()*0.001, ray.direction);
 		if (maxDepth > 0) {
 			float tMain = std::numeric_limits<double>::infinity();
 			std::shared_ptr<Hittable> hittableMain;
