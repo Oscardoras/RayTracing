@@ -2,6 +2,7 @@
 #define MATERIALS_LAMBERTIAN_H_
 
 #include "Material.hpp"
+#include "../textures/Texture.hpp"
 #include "../World.hpp"
 
 
@@ -9,11 +10,11 @@ class Lambertian: public Material {
 
 public:
 
-	Color albedo;
+	std::shared_ptr<Texture> texture;
 
-	Lambertian(Color albedo) : Material(), albedo(albedo) {}
+	Lambertian(std::shared_ptr<Texture> texture) : Material(), texture(texture) {}
 	
-	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const override {
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, float const& u, float const& v, int const& remaningRays, int const& maxDepth) const override {
 		Color c;
 		for (int i = 0; i < remaningRays; i++) {
 			Vector v;
@@ -35,7 +36,7 @@ public:
 			c += lightData.light*lightData.albedo*pb;
 		}
 
-		return LightData(albedo, c/remaningRays, long(this));
+		return LightData(texture->get(u, v), c/remaningRays, long(this));
 	}
 
 };

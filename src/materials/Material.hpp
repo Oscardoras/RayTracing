@@ -9,7 +9,7 @@ class Material {
 
 public:
 
-	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, int const& remaningRays, int const& maxDepth) const = 0;
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, float const& u, float const& v, int const& remaningRays, int const& maxDepth) const = 0;
 
 };
 

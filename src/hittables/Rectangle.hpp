@@ -35,7 +35,9 @@ public:
 
 	virtual LightData color(World const& world, Point const& point, Vector const& reflected, int const& remaningRays, int const& maxDepth) const override {
 		Vector faceDirection(1., 0., 0.);
-		return material->color(world, point, reflected, faceDirection*reflected < 0 ? faceDirection : -1*faceDirection, remaningRays, maxDepth);
+		float u = point.y - y1;
+		float v = point.z - z1;
+		return material->color(world, point, reflected, faceDirection*reflected < 0 ? faceDirection : -1*faceDirection, u, v, remaningRays, maxDepth);
 	}
 
 };
