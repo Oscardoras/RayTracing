@@ -13,6 +13,7 @@ int nbr = 0;
 #include "materials/Light.hpp"
 #include "textures/Plain.hpp"
 #include "textures/Tile.hpp"
+#include "textures/ImageTexture.hpp"
 
 
 class Level: public World {
@@ -33,12 +34,12 @@ std::shared_ptr<World> getLevel() {
 	//level->add(std::make_shared<Sphere>(Point(0,50,0), 2., std::make_shared<Light>(1000*Color(1,1,1))));
 	//level->priorities.push_back(std::make_shared<Priority>(Point(0,50,0), 2.));
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
-	level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Tile>(Color(1,1,1), Color(0,1,0), 0.25))));
+	level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<image_texture>("earthmap.jpg"))));
 	//level->add(std::make_shared<Triangle>(Point(-1,0,-1), Point(1,0,-1), Point(1,0,0.5), std::make_shared<Lambertian>(std::make_shared<Plain>(1., 1., 1.))));
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
-	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Lambertian>(std::make_shared<Plain>(1., 1., 0.))));
+	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Lambertian>(std::make_shared<Tile>(Color(1,1,1), Color(0,1,0), 0.125))));
 	//level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Dielectric>(Color(1., 1., 1.), 1.5)));
-	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Metal>(Color(0.9, 0.9, 0.9), 0.)));
+	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Metal>(Color(0.9, 0.9, 0.9), 0.)));
 	//level->add(std::make_shared<Sphere>(Point(0,0,-1), 0.5, std::make_shared<Light>(10.*Color(1., 1., 1.))));
 	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,-1), 0.5));
 	return level;
@@ -77,7 +78,7 @@ std::shared_ptr<World> getLevel() {
 
 int main() {
 	int maxRayPerPixel = 15;
-	Point pos = Point(4., 0.5, -2.);
+	Point pos = Point(4., 0.5, -4.);
 	Camera cam(getLevel(), pos, (Point(1,0,0.5) - pos).unit(), Vector(0,1,0), 720, 16./9.);
 	//cam.world->priority = 1.0;
 

@@ -39,12 +39,15 @@ public:
 	}
 
 	virtual LightData color(World const& world, Point const& point, Vector const& reflected, int const& remaningRays, int const& maxDepth) const override {
-		Vector p = (point - center) / radius;
-		float theta = std::acos(p.x);
-		if (p.z < 0) theta = -theta;
-		float phi = std::acos(p.x);
-		if (p.z < 0) theta = -theta;
-		return material->color(world, point, reflected, (point-center).unit(), 0, 0, remaningRays, maxDepth);
+		Vector o = point - center;
+
+		float xz_radius = Vector(o.x, 0, o.z).length();
+		float theta = std::acos(o.x / xz_radius);
+		if (o.z < 0) theta += pi;
+
+		float phi = std::asin(o.y / radius) + pi;
+
+		return material->color(world, point, reflected, o.unit(), theta*radius, phi*radius, remaningRays, maxDepth);
 	}
 
 };
