@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include "libimage.hpp"
 
 #include "algebra/Color.hpp"
 
@@ -32,30 +33,53 @@ public:
 	}
 
 	Image(std::string const& path) {
-		std::ifstream stream(path);
-		std::string line;
-		std::getline(stream, line);
+		const std::string ppm = ".ppm";
+		if (ppm.size() > path.size() && std::equal(ppm.rbegin(), ppm.rend(), path.rbegin())) {
+			std::ifstream stream(path);
+			std::string line;
+			std::getline(stream, line);
 
-		std::getline(stream, line);
-		int i = line.find_first_of(' ');
-		width = std::stoi(line.substr(0, i));
-		height = std::stoi(line.substr(i+1));
-		pixels = new Color *[height];
-		for(int j = 0; j < height; j++) pixels[j] = new Color[width];
-
-		std::getline(stream, line);
-
-		int n = 0;
-		while (std::getline(stream, line)) {
-			int y = n/width;
-			int x = n%width;
+			std::getline(stream, line);
 			int i = line.find_first_of(' ');
-			int j = line.find_last_of(' ');
-			float r = std::stoi(line.substr(0, i))/255.;
-			float g = std::stoi(line.substr(i+1, j-i-1))/255.;
-			float b = std::stoi(line.substr(j+1))/255.;
-			pixels[height-1-y][x] = Color(r, g, b);
-			n++;
+			width = std::stoi(line.substr(0, i));
+			height = std::stoi(line.substr(i+1));
+			pixels = new Color *[height];
+			for(int j = 0; j < height; j++) pixels[j] = new Color[width];
+
+			std::getline(stream, line);
+
+			int n = 0;
+			while (std::getline(stream, line)) {
+				int y = n/width;
+				int x = n%width;
+				int i = line.find_first_of(' ');
+				int j = line.find_last_of(' ');
+				float r = std::stoi(line.substr(0, i))/255.;
+				float g = std::stoi(line.substr(i+1, j-i-1))/255.;
+				float b = std::stoi(line.substr(j+1))/255.;
+				pixels[height-1-y][x] = Color(r, g, b);
+				n++;
+			}
+		} else {
+			const static int bytes_per_pixel = 3;
+			unsigned char *data;
+			int bytes_per_scanline;
+			int components_per_pixel = bytes_per_pixel;
+
+			data = stbi_load(path.c_str(), &width, &height, &components_per_pixel, components_per_pixel);
+			if (!data) throw ("Could not load image file " + path);
+			bytes_per_scanline = bytes_per_pixel * width;
+
+			pixels = new Color *[height];
+			for(int j = 0; j < height; j++) {
+				pixels[j] = new Color[width];
+				for(int i = 0; i < width; i++) {
+					const float color_scale = 1.0 / 255.0;
+					unsigned char *pixel = data + j*bytes_per_scanline + i*bytes_per_pixel;
+
+					pixels[j][i] = Color(color_scale*pixel[0], color_scale*pixel[1], color_scale*pixel[2]);
+				}
+			}
 		}
 	}
 

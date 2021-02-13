@@ -43,9 +43,9 @@ public:
 
 		float xz_radius = Vector(o.x, 0, o.z).length();
 		float theta = std::acos(o.x / xz_radius);
-		if (o.z < 0) theta += pi;
+		if (o.z < 0) theta = -theta + 2*pi;
 
-		float phi = std::asin(o.y / radius) + pi;
+		float phi = std::asin(o.y / radius) + pi/2;
 
 		return material->color(world, point, reflected, o.unit(), theta*radius, phi*radius, remaningRays, maxDepth);
 	}
