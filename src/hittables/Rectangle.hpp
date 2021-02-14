@@ -37,7 +37,7 @@ public:
 		Vector faceDirection(1., 0., 0.);
 		float u = point.z - z1;
 		float v = point.y - y1;
-		return material->color(world, point, reflected, faceDirection*reflected < 0 ? faceDirection : -1*faceDirection, u, v, remaningRays, maxDepth);
+		return material->color(world, point, reflected, faceDirection*reflected < 0 ? faceDirection : -1*faceDirection, *this, u, v, remaningRays, maxDepth);
 	}
 
 };

@@ -17,7 +17,7 @@ public:
 
 	Dielectric(Color albedo, float refractive_index) : Material(), albedo(albedo), refractive_index(refractive_index) {}
 
-	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, float const& u, float const& v, int const& remaningRays, int const& maxDepth) const override {
+	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, Hittable const& hittable, float const& u, float const& v, int const& remaningRays, int const& maxDepth) const override {
 		Color albe;
 		Color light;
 		long id = long(this);

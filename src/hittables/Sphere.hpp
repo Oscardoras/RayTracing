@@ -20,10 +20,12 @@ public:
 
 	virtual float hit(Ray const& r, float const& tMax) const {
 		Vector oc = r.origin - center;
+		float l2 = oc.lengthSquared();
+		if (l2 < radius*radius) return 0;
 		float a = r.direction.lengthSquared();
 		float halfB = oc*r.direction;
 		if (halfB < 0) {
-			float c = oc.lengthSquared() - radius*radius;
+			float c = l2 - radius*radius;
 			float discriminant = halfB*halfB - a*c;
 
 			if (discriminant > 0) {
@@ -39,15 +41,16 @@ public:
 	}
 
 	virtual LightData color(World const& world, Point const& point, Vector const& reflected, int const& remaningRays, int const& maxDepth) const override {
-		Vector o = point - center;
+		Vector oc = point - center;
+		if (oc.lengthSquared() < radius*radius) return material->color(world, point, reflected, Vector(), *this, 0., 0., remaningRays, maxDepth);
 
-		float xz_radius = Vector(o.x, 0, o.z).length();
-		float theta = std::acos(o.x / xz_radius);
-		if (o.z < 0) theta = -theta + 2*pi;
+		float xz_radius = Vector(oc.x, 0, oc.z).length();
+		float theta = std::acos(oc.x / xz_radius);
+		if (oc.z < 0) theta = -theta + 2*pi;
 
-		float phi = std::asin(o.y / radius) + pi/2;
+		float phi = std::asin(oc.y / radius) + pi/2;
 
-		return material->color(world, point, reflected, o.unit(), theta*radius, phi*radius, remaningRays, maxDepth);
+		return material->color(world, point, reflected, oc.unit(), *this, theta*radius, phi*radius, remaningRays, maxDepth);
 	}
 
 };
