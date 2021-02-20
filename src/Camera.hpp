@@ -11,7 +11,7 @@
 #include <mutex>
 
 #include "World.hpp"
-#include "Rendering.hpp"
+#include "images/Rendering.hpp"
 
 
 class Camera {

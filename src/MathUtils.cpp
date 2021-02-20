@@ -1,3 +1,6 @@
+#ifndef MATHUTILS_C_
+#define MATHUTILS_C_
+
 #include <cstdlib>
 
 constexpr float pi = 3.14;
@@ -9,6 +12,10 @@ inline double random_double() {
 
 inline double random_double(double min, double max) {
     return min + (max-min)*random_double();
+}
+
+inline int random_int(int min, int max) {
+    return int(random_double(min, max));
 }
 
 float sqrt(float x, float epsilon) {
@@ -32,3 +39,6 @@ float med(std::vector<float> v) {
         else return v[s/2];
     } else return 0.;
 }
+
+
+#endif

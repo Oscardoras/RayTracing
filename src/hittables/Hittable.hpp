@@ -2,7 +2,6 @@
 #define HITTABLES_HITTABLE_H_
 
 #include "../algebra/Ray.hpp"
-#include "../Image.hpp"
 
 class World;
 

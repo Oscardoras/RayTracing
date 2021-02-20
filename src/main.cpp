@@ -14,6 +14,7 @@ int nbr = 0;
 #include "textures/Plain.hpp"
 #include "textures/Tile.hpp"
 #include "textures/ImageTexture.hpp"
+#include "textures/Noise.hpp"
 
 
 class Level: public World {
@@ -31,12 +32,12 @@ public:
 
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
-	level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
-	level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("earthmap.jpg"), 1, 1))));
+	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
+	level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-1,0,-1), Point(1,0,-1), Point(1,0,0.5), std::make_shared<Lambertian>(std::make_shared<Plain>(1., 1., 1.))));
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
-	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("earthmap.jpg"), pi, pi/2))));
-	level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Dielectric>(Color(1., 1., 1.), 1.5)));
+	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("earthmap.jpg"), pi, pi/2))));
+	//level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Dielectric>(Color(1., 1., 1.), 1.5)));
 	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Metal>(Color(0.9, 0.9, 0.9), 0.)));
 	//level->add(std::make_shared<Sphere>(Point(0,0,100), 1, std::make_shared<Light>(25000.*Color(1., 1., 1.))));
 	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,100), 1));

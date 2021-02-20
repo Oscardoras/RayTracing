@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include "Texture.hpp"
-#include "../Image.hpp"
+#include "../images/Image.hpp"
 
 
 class ImageTexture: public Texture {
