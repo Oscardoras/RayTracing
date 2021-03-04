@@ -35,8 +35,8 @@ protected:
 			lock->lock();
 			int y;
 			if (!lines->empty()) {
-				std::cout << "Remaining lines : " << lines->size() << std::endl;
 				y = lines->front();
+				std::cout << "Rendering line : " << y << std::endl;
 				lines->erase(lines->begin());
 			} else break;
 			lock->unlock();
@@ -45,10 +45,10 @@ protected:
 				float u = float(x) / (rendering->width-1);
 				float v = float(y) / (rendering->height-1);
 				Ray r(position, corner + u*horizontal + v*vertical - position);
-				LightData lightData = world->trace(r, x%2 == y%2 ? maxRayPerPixel : 1, maxDepth);
+				Light light = world->trace(r, true, (!half || x%2 == y%2) ? maxRayPerPixel : 1, maxDepth);
 				
 				lock->lock();
-				rendering->set(x, y, lightData);
+				rendering->set(x, y, light);
 				lock->unlock();
 			}
 		}
@@ -57,6 +57,7 @@ protected:
 	static void complete(Rendering& rendering) {
 		Color **completed = new Color *[rendering.height];
 		for (int y = 0; y < rendering.height; y++) {
+			std::cout << "Completing line : " << y << std::endl;
 			completed[y] = new Color[rendering.width];
 			for (int x = 0; x < rendering.width; x++) {
 				long id = rendering.ids[y][x];
@@ -65,58 +66,57 @@ protected:
 				std::vector<float> vb;
 
 				if (y%2 == x%2) {
-					Color c = rendering.light.pixels[y][x];
+					Color c = rendering.scatterIllumination.pixels[y][x];
 					vr.push_back(c.r);
 					vg.push_back(c.g);
 					vb.push_back(c.b);
 
 					if (y > 0 && x > 0 && rendering.ids[y-1][x-1] == id) {
-						Color c = rendering.light.pixels[y-1][x-1];
+						Color c = rendering.scatterIllumination.pixels[y-1][x-1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					if (y > 0 && x < rendering.width-1 && rendering.ids[y-1][x+1] == id) {
-						Color c = rendering.light.pixels[y-1][x+1];
+						Color c = rendering.scatterIllumination.pixels[y-1][x+1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					if (y < rendering.height-1 && x < rendering.width-1 && rendering.ids[y+1][x+1] == id) {
-						Color c = rendering.light.pixels[y+1][x+1];
+						Color c = rendering.scatterIllumination.pixels[y+1][x+1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					if (y < rendering.height-1 && x > 0 && rendering.ids[y+1][x-1] == id) {
-						Color c = rendering.light.pixels[y+1][x-1];
+						Color c = rendering.scatterIllumination.pixels[y+1][x-1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					completed[y][x] = Color(med(vr), med(vg), med(vb));
-					completed[y][x] = rendering.light.pixels[y][x];
 				} else {
 					if (y > 0 && rendering.ids[y-1][x] == id) {
-						Color c = rendering.light.pixels[y-1][x];
+						Color c = rendering.scatterIllumination.pixels[y-1][x];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}																																																																																																																																																																						
 					if (x < rendering.width-1 && rendering.ids[y][x+1] == id) {
-						Color c = rendering.light.pixels[y][x+1];
+						Color c = rendering.scatterIllumination.pixels[y][x+1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					if (y < rendering.height-1 && rendering.ids[y+1][x] == id) {
-						Color c = rendering.light.pixels[y+1][x];
+						Color c = rendering.scatterIllumination.pixels[y+1][x];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
 					}
 					if (x > 0 && rendering.ids[y][x-1] == id) {
-						Color c = rendering.light.pixels[y][x-1];
+						Color c = rendering.scatterIllumination.pixels[y][x-1];
 						vr.push_back(c.r);
 						vg.push_back(c.g);
 						vb.push_back(c.b);
@@ -126,9 +126,9 @@ protected:
 			}
 		}
 
-		for(int j = 0; j < rendering.height; j++) delete rendering.light.pixels[j];
-		delete rendering.light.pixels;
-		rendering.light.pixels = completed;
+		for(int j = 0; j < rendering.height; j++) delete rendering.scatterIllumination.pixels[j];
+		delete rendering.scatterIllumination.pixels;
+		rendering.scatterIllumination.pixels = completed;
 	}
 
 public:

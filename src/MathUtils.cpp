@@ -5,6 +5,7 @@
 
 constexpr float pi = 3.14;
 constexpr float NaN = std::numeric_limits<double>::signaling_NaN();
+constexpr float Infinite = std::numeric_limits<double>::infinity();
 
 inline double random_double() {
     return rand() / (RAND_MAX + 1.0);
@@ -14,30 +15,32 @@ inline double random_double(double min, double max) {
     return min + (max-min)*random_double();
 }
 
-inline int random_int(int min, int max) {
-    return int(random_double(min, max));
+inline double random_int(double min, double max) {
+    return int(random_double(min, max+1));
 }
 
-float sqrt(float x, float epsilon) {
-    float a = 0;
-    float b = x;
-    float c = (a+b)/2;
-    while (b-a > epsilon) {
-        float c = (a+b)/2;
-        float v = x - c*c;
-        if (v >= 0) a = c;
-        else b = c;
+inline bool between(float x, float a, float b) {
+    if (a <= b) return a <= x && x <= b;
+    else return b <= x && x <= a;
+}
+
+float med(std::vector<float> array) {
+    int size = array.size();
+
+    if (size == 0) return 0.;
+
+    for (int i = 0; i < size; i++) {
+        float x = array[i];
+        int j = i;
+        while (j > 0 && x < array[j-1]) {
+            array[j] = array[j-1];
+            j-=1;
+        }
+        array[j] = x;
     }
-    return (a+b)/2;
-}
-
-float med(std::vector<float> v) {
-    int s = v.size();
-    if (s > 0) {
-        std::sort(v.begin(), v.end());
-        if (s%2 == 0) return (v[(s/2) - 1] + v[s/2]) / 2;
-        else return v[s/2];
-    } else return 0.;
+    
+    if (size%2 == 0) return (array[(size/2) - 1] + array[size/2]) / 2;
+    else return array[size/2];
 }
 
 

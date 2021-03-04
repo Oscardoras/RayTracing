@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
-#include "libimage.hpp"
+#include "stbi.hpp"
 
 #include "../algebra/Color.hpp"
 #include "../MathUtils.cpp"
@@ -85,8 +85,8 @@ public:
 	}
 
 	~Image() {
-		for(int j = 0; j < height; j++) delete pixels[j];
-		delete pixels;
+		for(int j = 0; j < height; j++) delete[] pixels[j];
+		delete[] pixels;
 	}
 
 	bool save(std::string const& path) {
@@ -124,8 +124,8 @@ public:
 			}
 		}
 
-		for(int j = 0; j < height; j++) delete pixels[j];
-		delete pixels;
+		for(int j = 0; j < height; j++) delete[] pixels[j];
+		delete[] pixels;
 		pixels = filtered;
 	}
 
@@ -136,9 +136,9 @@ public:
 	void blur(int size) {
 		std::vector<std::vector<float>> m;
 		float value = 1/(size*size);
-		for (int y = -size; y <= size; y++) {
+		for (int y = 0; y < size; y++) {
 			std::vector<float> l;
-			for (int x = -size; x <= size; x++) {
+			for (int x = 0; x < size; x++) {
 				l.push_back(value);
 			}
 			m.push_back(l);
@@ -148,10 +148,11 @@ public:
 	}
 
 	void gaussian(int size, float o) {
+		int s = (size-1)/2;
 		std::vector<std::vector<float>> m;
-		for (int y = -size; y <= size; y++) {
+		for (int y = -s; y <= s; y++) {
 			std::vector<float> l;
-			for (int x = -size; x <= size; x++) {
+			for (int x = -s; x <= s; x++) {
 				l.push_back(std::exp( -(x*x + y*y) / (2*o*o) ) / (2*pi*o*o));
 			}
 			m.push_back(l);
@@ -164,6 +165,8 @@ public:
 		Color **filtered = new Color *[height];
 		for(int j = 0; j < height; j++) filtered[j] = new Color[width];
 
+		int s = (size-1)/2;
+
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				std::vector<float> vr;
@@ -172,8 +175,8 @@ public:
 
 				for (int j = 0; j < size; j++) {
 					for (int i = 0; i < size; i++) {
-						if (y-size+j >= 0 && y-size+j <= height-1 && x-size+i >= 0 && x-size+i <= width-1) {
-							Color c = pixels[y-size+j][x-size+i];
+						if (y-s+j >= 0 && y-s+j <= height-1 && x-s+i >= 0 && x-s+i <= width-1) {
+							Color c = pixels[y-s+j][x-s+i];
 							vr.push_back(c.r);
 							vg.push_back(c.g);
 							vb.push_back(c.b);
@@ -185,8 +188,8 @@ public:
 			}
 		}
 
-		for(int j = 0; j < height; j++) delete pixels[j];
-		delete pixels;
+		for(int j = 0; j < height; j++) delete[] pixels[j];
+		delete[] pixels;
 		pixels = filtered;
 	}
 
@@ -210,28 +213,6 @@ public:
 			std::vector<float> { -1., -1., 24., -1., -1. },
 			std::vector<float> { -1., -1., -1., -1., -1. },
 			std::vector<float> { -1., -1., -1., -1., -1. }
-		};
-
-		filtre(m);
-	}
-
-	void smooth3() {
-		std::vector<std::vector<float>> m {
-			std::vector<float> { 1./16., 2./16., 1./16. },
-			std::vector<float> { 2./16., 4./16., 2./16. },
-			std::vector<float> { 1./16., 2./16., 1./16. }
-		};
-
-		filtre(m);
-	}
-
-	void smooth5() {
-		std::vector<std::vector<float>> m {
-			std::vector<float> { 2./159., 4./159., 5./159., 4./159., 2./159. },
-			std::vector<float> { 4./159., 9./159., 12./159., 9./159., 4./159. },
-			std::vector<float> { 5./159., 12./159., 15./159., 12./159., 5./159. },
-			std::vector<float> { 4./159., 9./159., 12./159., 9./159., 4./159. },
-			std::vector<float> { 2./159., 4./159., 5./159., 4./159., 2./159. }
 		};
 
 		filtre(m);

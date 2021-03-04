@@ -8,6 +8,14 @@
 #include "Point.hpp"
 #include "Vector.hpp"
 
+class Object;
+
+
+struct Hit {
+	std::shared_ptr<Object> object;
+	float t;
+};
+
 
 class Ray {
 
@@ -15,9 +23,10 @@ public:
 
 	const Point origin;
 	const Vector direction;
+	float ior;
 
-	Ray() {}
-	Ray(Point const origin, Vector const direction): origin(origin), direction(direction) {}
+	Ray() : ior(1) {}
+	Ray(Point const origin, Vector const direction, float const ior = 1) : origin(origin), direction(direction), ior(ior) {}
 
 	inline Point at(float const t) const {
 		return origin + t*direction;

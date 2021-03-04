@@ -14,30 +14,38 @@ public:
 
 	Lambertian(std::shared_ptr<Texture> texture) : Material(), texture(texture) {}
 	
-	virtual LightData color(World const& world, Point const& point, Vector const& reflected, Vector const& faceDirection, Hittable const& hittable, float const& u, float const& v, int const& remaningRays, int const& maxDepth) const override {
-		Color c;
-		for (int i = 0; i < remaningRays; i++) {
-			Vector v;
-			float pb;
-			if (!world.priorities.empty() && i < remaningRays*world.priority) {
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& remainingRays, int const& maxDepth) const override {
+		Spectrum sp;
+		for (int i = 0; i < remainingRays; i++) {
+			Vector vec;
+			float p;
+			if (!world.priorities.empty() && i < remainingRays*world.priority) {
 				std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
 				float radius  = priority->radius;
-				v = (priority->center + Vector::random()*radius) - point;
-				pb = ( (pi*radius*radius) / v.lengthSquared() ) / (4*pi*1*1);
-				if (v*faceDirection < 0) v *= -1;
+				vec = (priority->center + Vector::random()*radius) - ray.origin;
+				p = ( (pi*radius*radius) / vec.lengthSquared() ) / (4*pi*1*1);
+				if (vec*faceDirection < 0) vec *= -1;
 
-				v = v.unit();
+				vec = vec.unit();
 			} else {
-				v = Vector::randomUnit();
-				if (v*faceDirection < 0) v *= -1;
-				pb = 1;
+				vec = Vector::randomUnit();
+				if (vec*faceDirection < 0) vec *= -1;
+				p = 1;
 			}
-			LightData lightData = world.trace(Ray(point, v), 1, maxDepth-1);
-			c += lightData.light*lightData.albedo*pb;
+			Light light = world.trace(Ray(ray.origin, vec), true, 1, maxDepth);
+			sp += light.compute()*p;
 		}
 
-		return LightData(texture->get(u, v), c/remaningRays, long(this));
+		return Light(Spectrum(), Light(), Light(), texture->get(relative.u, relative.v).toSpectrum(), sp/remainingRays, long(this));
 	}
+
+	/*
+	- On tire dans chaque région privilégiée et on divise à chaque fois par le nombre de rayons tirés dans la région.
+	- On tire les rayons normaux et on divise par le nombre de rayons normaux tirés.
+	- On pondère la lumière de chaque région par sa taille.
+	- On somme les lumières pondérés.
+	- On divise le tout par la somme des pondérations.
+	*/
 
 };
 

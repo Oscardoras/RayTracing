@@ -2,7 +2,9 @@
 #define ALGEBRA_VECTOR_H_
 
 #include <cmath>
+
 #include "../MathUtils.cpp"
+class Point;
 
 
 class Vector {
@@ -53,13 +55,12 @@ public:
 	}
 
 	inline Vector unit() const {
-		/*float l2 = lengthSquared();
-		float l;
-		if (l2 <= 2.) l = 0.5 + l2/2;
-		else l = sqrt(l2);*/
-		float l = length();
-		return Vector(x / l, y / l, z / l);
+		return *this / length();
+		/*float l = length();
+		return Vector(x / l, y / l, z / l);*/
 	}
+
+	inline Point toPoint() const;
 
 	inline static Vector random(double min, double max) {
 		return Vector(random_double(min, max), random_double(min, max), random_double(min, max));
