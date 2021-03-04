@@ -56,8 +56,8 @@ public:
 		return NaN;
 	}
 
-	virtual Light color(Ray const& ray, World const& world, int const& remainingRays, int const& maxDepth) const override {
-		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -1*V, ray, world, remainingRays, maxDepth);
+	virtual Light color(Ray const& ray, World const& world, int const& maxDepth) const override {
+		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -1*V, ray, world, maxDepth);
 	}
 
 	virtual Box getBox() const {

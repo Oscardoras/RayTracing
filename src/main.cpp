@@ -8,11 +8,11 @@ int nbr = 0;
 #include "objects/Sphere.hpp"
 #include "objects/Triangle.hpp"
 #include "materials/Lambertian.hpp"
-#include "materials/Metal.hpp"
-#include "materials/Dielectric.hpp"
-#include "materials/Lamp.hpp"
-#include "materials/Marble.hpp"
-#include "materials/Fog.hpp"
+//#include "materials/Metal.hpp"
+//#include "materials/Dielectric.hpp"
+//#include "materials/Lamp.hpp"
+//#include "materials/Marble.hpp"
+//#include "materials/Fog.hpp"
 #include "textures/Plain.hpp"
 #include "textures/Tile.hpp"
 #include "textures/ImageTexture.hpp"
@@ -37,20 +37,20 @@ std::shared_ptr<World> getLevel() {
 
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
-	level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
+	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
 	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("earthmap.jpg"), pi, pi/2))));
-	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
+	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
 	//level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Dielectric>(Color(1., 1., 1.), 1.5)));
 	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Textured>()));
 	//level->add(std::make_shared<Sphere>(Point(0,0,100), 1, std::make_shared<Light>(25000.*Color(1., 1., 1.))));
 	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,100), 1));
 
 	level->sort(false);
-	level->tree->print();
+	//level->tree->print();
 	return level;
 }
 
-std::shared_ptr<World> getLevel2() {
+/*std::shared_ptr<World> getLevel2() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
 	
@@ -81,7 +81,7 @@ std::shared_ptr<World> getLevel2() {
 	level->sort();
 	level->tree->print();
 	return level;
-}
+}*/
 
 int main() {
 	int maxRayPerPixel = 5;

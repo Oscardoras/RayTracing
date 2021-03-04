@@ -55,9 +55,8 @@ public:
 	}
 
 	inline Vector unit() const {
-		return *this / length();
-		/*float l = length();
-		return Vector(x / l, y / l, z / l);*/
+		float l = length();
+		return Vector(x / l, y / l, z / l);
 	}
 
 	inline Point toPoint() const;

@@ -41,9 +41,9 @@ public:
 		return NaN;
 	}
 
-	virtual Light color(Ray const& ray, World const& world, int const& remainingRays, int const& maxDepth) const override {
+	virtual Light color(Ray const& ray, World const& world, int const& maxDepth) const override {
 		Vector oc = ray.origin - center;
-		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, 0., 0.), Vector(), ray, world, remainingRays, maxDepth);
+		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, 0., 0.), Vector(), ray, world, maxDepth);
 
 		float xz_radius = Vector(oc.x, 0, oc.z).length();
 		float theta = std::acos(oc.x / xz_radius);
@@ -51,7 +51,7 @@ public:
 
 		float phi = std::asin(oc.y / radius) + pi/2;
 
-		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), ray, world, remainingRays, maxDepth);
+		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), ray, world, maxDepth);
 	}
 
 	virtual Box getBox() const {

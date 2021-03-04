@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	static void th(std::mutex *lock, std::shared_ptr<std::vector<int>> lines, Rendering *rendering, std::shared_ptr<World> world, Point position, Point corner, Vector horizontal, Vector vertical, bool half, int maxRayPerPixel, int maxDepth) {
+	static void th(std::mutex *lock, std::shared_ptr<std::vector<int>> lines, Rendering *rendering, std::shared_ptr<World> world, Point position, Point corner, Vector horizontal, Vector vertical, bool half, int samplesPerPixel, int maxDepth) {
 		while (!lines->empty()) {
 			lock->lock();
 			int y;
@@ -42,14 +42,20 @@ protected:
 			lock->unlock();
 
 			for (int x = 0; x < rendering->width; x++) {
-				float u = float(x) / (rendering->width-1);
-				float v = float(y) / (rendering->height-1);
-				Ray r(position, corner + u*horizontal + v*vertical - position);
-				Light light = world->trace(r, true, (!half || x%2 == y%2) ? maxRayPerPixel : 1, maxDepth);
-				
-				lock->lock();
-				rendering->set(x, y, light);
-				lock->unlock();
+				if ((!half || x%2 == y%2)) {
+					float u = (x + random_double(-0.5, 0.5)) / (rendering->width-1);
+					float v = (y + random_double(-0.5, 0.5)) / (rendering->height-1);
+
+					Light light = Light();
+					for (int i = 0; i < samplesPerPixel; i++) {
+						Ray r(position, corner + u*horizontal + v*vertical - position);
+						light += world->trace(r, true, (!half || x%2 == y%2) ? samplesPerPixel : 1, maxDepth);
+					}
+					
+					lock->lock();
+					rendering->set(x, y, light/samplesPerPixel);
+					lock->unlock();
+				}
 			}
 		}
 	}
@@ -133,7 +139,7 @@ protected:
 
 public:
 
-	Rendering render(int t, bool half, int maxRayPerPixel, int maxDepth) const {
+	Rendering render(int t, bool half, int samplesPerPixel, int maxDepth) const {
 		const int height = resolution;
 		const int width = static_cast<int>(resolution * ratio);
 
@@ -150,8 +156,8 @@ public:
 		std::vector<std::shared_ptr<std::thread>> threads;
 		std::mutex lock;
 		for (; t > 0; t--) {
-			threads.push_back(std::make_shared<std::thread>(Camera::th, &lock, lines, &rendering, world, position, corner, horizontal, vertical, half, maxRayPerPixel, maxDepth));
-			//Camera::th(&lock, lines, &rendering, world, position, corner, horizontal, vertical, half, maxRayPerPixel, maxDepth);
+			threads.push_back(std::make_shared<std::thread>(Camera::th, &lock, lines, &rendering, world, position, corner, horizontal, vertical, half, samplesPerPixel, maxDepth));
+			//Camera::th(&lock, lines, &rendering, world, position, corner, horizontal, vertical, half, samplesPerPixel, maxDepth);
 		}
     	for (int i = 0; i < threads.size(); i++) threads[i]->join();
 

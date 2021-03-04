@@ -114,10 +114,10 @@ public:
 		return tree->hit(ray, 0.001, Infinite, in);
 	}
 
-	Light trace(Ray const& ray, bool const& in, int const& remainingRays, int const& maxDepth) const {
+	Light trace(Ray const& ray, bool const& in, int const& maxDepth) const {
 		if (maxDepth > 0) {
 			Hit hit = this->hit(ray, in);
-			if (std::isfinite(hit.t)) return hit.object->color(Ray(ray.at(hit.t), ray.direction, ray.ior), *this, remainingRays, maxDepth-1);
+			if (std::isfinite(hit.t)) return hit.object->color(Ray(ray.at(hit.t), ray.direction, ray.ior), *this, maxDepth-1);
 			else return Light(infiniteColor(ray), Light(), Light(), Spectrum(), Spectrum());
 		} else return Light();
 	}

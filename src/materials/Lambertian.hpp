@@ -14,29 +14,26 @@ public:
 
 	Lambertian(std::shared_ptr<Texture> texture) : Material(), texture(texture) {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& remainingRays, int const& maxDepth) const override {
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& maxDepth) const override {
 		Spectrum sp;
-		for (int i = 0; i < remainingRays; i++) {
-			Vector vec;
-			float p;
-			if (!world.priorities.empty() && i < remainingRays*world.priority) {
-				std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
-				float radius  = priority->radius;
-				vec = (priority->center + Vector::random()*radius) - ray.origin;
-				p = ( (pi*radius*radius) / vec.lengthSquared() ) / (4*pi*1*1);
-				if (vec*faceDirection < 0) vec *= -1;
+		Vector vec;
+		float p;
+		/*if (!world.priorities.empty() && i < remainingRays*world.priority) {
+			std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
+			float radius  = priority->radius;
+			vec = (priority->center + Vector::random()*radius) - ray.origin;
+			p = ( (pi*radius*radius) / vec.lengthSquared() ) / (4*pi*1*1);
+			if (vec*faceDirection < 0) vec *= -1;
 
-				vec = vec.unit();
-			} else {
-				vec = Vector::randomUnit();
-				if (vec*faceDirection < 0) vec *= -1;
-				p = 1;
-			}
-			Light light = world.trace(Ray(ray.origin, vec), true, 1, maxDepth);
-			sp += light.compute()*p;
-		}
+			vec = vec.unit();
+		} else {*/
+			vec = Vector::randomUnit();
+			if (vec*faceDirection < 0) vec *= -1;
+			p = 1;
+		//}
+		sp = world.trace(Ray(ray.origin, vec), true, maxDepth).compute()*p;
 
-		return Light(Spectrum(), Light(), Light(), texture->get(relative.u, relative.v).toSpectrum(), sp/remainingRays, long(this));
+		return Light(Spectrum(), Light(), Light(), texture->get(relative.u, relative.v).toSpectrum(), sp, long(this));
 	}
 
 	/*
