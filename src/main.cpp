@@ -43,7 +43,7 @@ std::shared_ptr<World> getLevel() {
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5)/*, priorities*/)));
 
 
-	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Dielectric>(1.5)));
+	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Dielectric>(1.5)));
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
