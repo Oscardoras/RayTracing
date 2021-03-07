@@ -22,7 +22,7 @@ class Material {
 
 public:
 
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& maxDepth) const = 0;
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& remaningRays, int const& maxDepth) const = 0;
 
 };
 

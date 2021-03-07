@@ -25,13 +25,13 @@ public:
 
 	Textured() : Material() {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& remainingRays, int const& maxDepth) const override {
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
 		int const& u = relative.u;
 		int const& v = relative.v;
 
 		float fuzz = fuzziness->get(u, v).bw();
-		int rays = std::max(1, int(remainingRays*fuzz));
-		int remaining = int(remainingRays / rays);
+		int rays = std::max(1, int(samples*fuzz));
+		int remaining = int(samples / rays);
 
 		Color reflection;
 		for (int i = 0; i < rays; i++) {

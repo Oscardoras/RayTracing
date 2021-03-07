@@ -1,130 +1,110 @@
 #ifndef ALGEBRA_LIGHT_H_
 #define ALGEBRA_LIGHT_H_
 
-#include <cstdlib>
+#include <unordered_map>
+#include <tuple>
 
 #include "Spectrum.hpp"
+
+
+class Scatter {
+
+public:
+
+	int id;
+	Spectrum albedo;
+	Spectrum scattered;
+
+	Scatter(int id, Spectrum albedo, Spectrum scattered): id(id), albedo(albedo), scattered(scattered) {}
+
+};
 
 
 class Light {
 
 public:
 
-	Spectrum scatterAlbedo;
-	Spectrum scatterIllumination;
-	Spectrum addition;
-	long id;
+	Spectrum accurate;
+	std::vector<Scatter> smooth;
 
-	Light(int id = 0): id(id) {}
-	Light(Light const& light): scatterAlbedo(light.scatterAlbedo), scatterIllumination(light.scatterIllumination), addition(light.addition), id(light.id) {}
-	Light(Spectrum emitted, Light transmitted, Light specular, Spectrum scatteredAlbedo, Spectrum scatteredIllumination, int id = 0): id(id) {
-		long t = transmitted.scatterIllumination.getIntensity();
-		long s = specular.scatterIllumination.getIntensity();
-		long si = scatterIllumination.getIntensity();
-		if (si >= t && si >= s) {
-			scatterAlbedo = scatteredAlbedo;
-			scatterIllumination = scatteredIllumination;
-			addition = emitted + transmitted.compute() + specular.compute();
-		} else if (s >= t && s >= si) {
-			scatterAlbedo = specular.scatterAlbedo;
-			scatterIllumination = specular.scatterIllumination;
-			addition = emitted + transmitted.compute() + scatteredAlbedo*scatteredIllumination;
-		} else {
-			scatterAlbedo = transmitted.scatterAlbedo;
-			scatterIllumination = transmitted.scatterIllumination;
-			addition = emitted + specular.compute() + scatteredAlbedo*scatteredIllumination;
-		}
+	Light() {}
+	Light(int const& id, Spectrum const& albedo, Spectrum const& scattered) {
+		smooth.push_back(Scatter(id, albedo, scattered));
+	}
+	Light(Scatter const& scatter) {
+		smooth.push_back(scatter);
+	}
+	Light(Spectrum const& spectrum) {
+		accurate = spectrum;
 	}
 
-	inline Light& operator+=(Light const& c) {
-		scatterAlbedo += c.scatterAlbedo;
-		scatterIllumination += c.scatterIllumination;
-		addition += c.addition;
-		id += c.id;
-		id /= 2;
-		return *this;
-	}
-
-	inline Light& operator-=(Light const& c) {
-		scatterAlbedo -= c.scatterAlbedo;
-		scatterIllumination -= c.scatterIllumination;
-		addition -= c.addition;
-		id -= c.id;
-		id *= 2;
+	inline Light& operator+=(Light const& l) {
+		accurate += l.accurate;
+		for (Scatter scatter : l.smooth) smooth.push_back(scatter);
 		return *this;
 	}
 
 	inline Light& operator*=(float const& t) {
-		scatterAlbedo *= t;
-		scatterIllumination *= t;
-		addition *= t;
+		accurate *= t;
+		for (Scatter& scatter : smooth) scatter.albedo *= t;
 		return *this;
 	}
 
-	inline Light& operator*=(Spectrum const& c) {
-		scatterAlbedo *= c.r;
-		scatterIllumination *= c.g;
-		addition *= c.b;
+	inline Light& operator*=(Spectrum const& s) {
+		accurate *= s;
+		for (Scatter& scatter : smooth) scatter.albedo *= s;
 		return *this;
 	}
 
 	inline Light& operator/=(float const& t) {
-		scatterAlbedo /= t;
-		scatterIllumination /= t;
-		addition /= t;
+		operator*=(1/t);
 		return *this;
 	}
 
+	inline void addId(int const& id) {
+		for (Scatter& scatter : smooth) {
+			scatter.id += id;
+			scatter.id /= 2;
+		}
+	}
+
 	inline Spectrum compute() const {
-		return scatterAlbedo*scatterIllumination + addition;
+		Spectrum value = accurate;
+		for (Scatter scatter : smooth) value += scatter.albedo * scatter.scattered;
+		return value;
 	}
 
 };
 
-inline Light operator+(Light const& c, Light const& d) {
+inline Light operator+(Light const& l1, Light const& l2) {
 	Light light = Light();
-	light.scatterAlbedo = c.scatterAlbedo + d.scatterAlbedo;
-	light.scatterIllumination = c.scatterIllumination + d.scatterIllumination;
-	light.addition = c.addition + d.addition;
-	light.id = (c.id + d.id)/2;
+	light += l1;
+	light += l2;
 	return light;
 }
 
-inline Light operator-(Light const& c, Light const& d) {
-	Light light = Light();
-	light.scatterAlbedo = c.scatterAlbedo - d.scatterAlbedo;
-	light.scatterIllumination = c.scatterIllumination - d.scatterIllumination;
-	light.addition = c.addition - d.addition;
-	light.id = (c.id - d.id)*2;
+inline Light operator*(float const& t, Light const& l) {
+	Light light(l);
+	light *= t;
 	return light;
 }
 
-inline Light operator*(float const& t, Light const& c) {
-	Light light = Light();
-	light.scatterAlbedo = t * c.scatterAlbedo;
-	light.scatterIllumination = t * c.scatterIllumination;
-	light.addition = t * c.addition;
+inline Light operator*(Light const& l, float const& t) {
+	return t * l;
+}
+
+inline Light operator*(Light const& l, Spectrum const& s) {
+	Light light(l);
+	light *= s;
 	return light;
 }
 
-inline Light operator*(Light const& c, float const& t) {
-	return t * c;
+inline Light operator*(Spectrum const& s, Light const& l) {
+	return l * s;
 }
 
-inline Light operator*(Light const& c, Spectrum const& d) {
-	Light light = Light();
-	light.scatterAlbedo = d * c.scatterAlbedo;
-	light.scatterIllumination = d * c.scatterIllumination;
-	light.addition = d * c.addition;
-	return light;
-}
-
-inline Light operator*(Spectrum const& c, Light const& d) {
-	return d * c;
-}
-
-inline Light operator/(Light const& c, float const& t) {
-	return c * (1/t);
+inline Light operator/(Light const& l, float const& t) {
+	return l * (1/t);
 }
 
 

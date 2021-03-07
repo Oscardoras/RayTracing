@@ -22,7 +22,7 @@ public:
 		Vector oc = r.origin - center;
 
 		float l2 = oc.lengthSquared();
-		if (in && l2 + 0.01 < radius*radius) return 0;
+		//if (in && l2 + 0.01 < radius*radius) return 0;
 
 		float a = r.direction.lengthSquared();
 		float halfB = oc*r.direction;
@@ -41,17 +41,17 @@ public:
 		return NaN;
 	}
 
-	virtual Light color(Ray const& ray, World const& world, int const& maxDepth) const override {
+	virtual Light color(Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
 		Vector oc = ray.origin - center;
-		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, 0., 0.), Vector(), ray, world, maxDepth);
+		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, 0., 0.), Vector(), ray, world, samples, maxDepth);
 
 		float xz_radius = Vector(oc.x, 0, oc.z).length();
 		float theta = std::acos(oc.x / xz_radius);
-		if (oc.z < 0) theta = -theta + 2*pi;
+		if (oc.z < 0) theta = -theta + 2*Pi;
 
-		float phi = std::asin(oc.y / radius) + pi/2;
+		float phi = std::asin(oc.y / radius) + Pi/2;
 
-		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), ray, world, maxDepth);
+		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), ray, world, samples, maxDepth);
 	}
 
 	virtual Box getBox() const {

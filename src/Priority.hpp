@@ -12,8 +12,9 @@ public:
 
 	Point center;
 	float radius;
+	float portion;
 
-	Priority(Point center, float radius) : center(center), radius(radius) {}
+	Priority(Point center, float radius, float portion) : center(center), radius(radius), portion(portion) {}
 
 	bool hit(Ray const& r) const {
 		Vector oc = r.origin - center;
@@ -26,6 +27,20 @@ public:
 		return false;
 	}
 
+};
+
+class Area {
+
+public:
+
+	std::shared_ptr<Priority> priority;
+	float probability;
+	Spectrum spectrum;
+	int rays;
+
+	Area(std::shared_ptr<Priority> priority, Point origin): priority(priority), spectrum(), rays(0) {
+		probability = ( (Pi*priority->radius*priority->radius) / (priority->center - origin).lengthSquared() ) / (4*Pi*1*1);
+	}
 };
 
 

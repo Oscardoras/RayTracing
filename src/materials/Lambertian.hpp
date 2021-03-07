@@ -4,6 +4,7 @@
 #include "Material.hpp"
 #include "../textures/Texture.hpp"
 #include "../World.hpp"
+#include "../Priority.hpp"
 
 
 class Lambertian: public Material {
@@ -11,38 +12,58 @@ class Lambertian: public Material {
 public:
 
 	std::shared_ptr<Texture> texture;
+	std::vector<std::shared_ptr<Priority>> priorities;
 
-	Lambertian(std::shared_ptr<Texture> texture) : Material(), texture(texture) {}
+	Lambertian(std::shared_ptr<Texture> texture, std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
+		Material(), texture(texture), priorities(priorities) {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& maxDepth) const override {
-		Spectrum sp;
-		Vector vec;
-		float p;
-		/*if (!world.priorities.empty() && i < remainingRays*world.priority) {
-			std::shared_ptr<Priority> priority = world.priorities[i%world.priorities.size()];
-			float radius  = priority->radius;
-			vec = (priority->center + Vector::random()*radius) - ray.origin;
-			p = ( (pi*radius*radius) / vec.lengthSquared() ) / (4*pi*1*1);
-			if (vec*faceDirection < 0) vec *= -1;
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
+		float remaind = 1;
+		float probability = 1;
+		std::vector<Area> areas;
 
-			vec = vec.unit();
-		} else {*/
-			vec = Vector::randomUnit();
-			if (vec*faceDirection < 0) vec *= -1;
-			p = 1;
-		//}
-		sp = world.trace(Ray(ray.origin, vec), true, maxDepth).compute()*p;
+		for (std::shared_ptr<Priority> priority : priorities) {
+			Area area(priority, ray.origin);
+			remaind -= priority->portion;
+			probability -= area.probability;
+			int s = int(priority->portion*float(samples));
+			for (int i = 0; i < s; i++) {
+				Vector vec = (priority->center + Vector::random()*priority->radius) - ray.origin;
+				if (vec*faceDirection < 0) vec *= -1;
+				area.spectrum += world.trace(Ray(ray.origin, vec), true, 1, maxDepth).compute();
+				area.rays++;
+			}
+			areas.push_back(area);
+		}
 
-		return Light(Spectrum(), Light(), Light(), texture->get(relative.u, relative.v).toSpectrum(), sp, long(this));
+
+		Spectrum spectrum;
+		int rays = 0;
+		int s = int(remaind*float(samples));
+		for (int i = 0; i < s; i++) {
+			bool hit = false;
+			Vector vec = Vector::randomUnit();
+			if (vec*faceDirection < 0) vec *= -1;
+			Ray r = Ray(ray.origin, vec);
+			for (Area area : areas) {
+				if (area.priority->hit(r)) {
+					hit = true;
+					area.spectrum += world.trace(r, true, 1, maxDepth).compute();
+					area.rays++;
+				}
+			}
+			if (!hit) {
+				spectrum += world.trace(r, true, 1, maxDepth).compute();
+				rays++;
+			}
+		}
+
+		if (rays > 0) spectrum /= rays;
+		spectrum *= probability;
+		for (Area area : areas) if (area.rays > 0) spectrum += area.probability*area.spectrum/area.rays;
+
+		return Light(long(this), texture->get(relative.u, relative.v).toSpectrum(), spectrum);
 	}
-
-	/*
-	- On tire dans chaque région privilégiée et on divise à chaque fois par le nombre de rayons tirés dans la région.
-	- On tire les rayons normaux et on divise par le nombre de rayons normaux tirés.
-	- On pondère la lumière de chaque région par sa taille.
-	- On somme les lumières pondérés.
-	- On divise le tout par la somme des pondérations.
-	*/
 
 };
 

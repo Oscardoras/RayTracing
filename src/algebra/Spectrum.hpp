@@ -1,6 +1,7 @@
 #ifndef ALGEBRA_SPECTRUM_H_
 #define ALGEBRA_SPECTRUM_H_
 
+#include "../MathUtils.cpp"
 #include "Color.hpp"
 
 
@@ -72,6 +73,10 @@ inline Spectrum operator*(float const& t, Spectrum const& c) {
 	return Spectrum(t * c.r, t * c.g, t * c.b);
 }
 
+inline Spectrum operator-(Spectrum const& s) {
+	return -1 * s;
+}
+
 inline Spectrum operator*(Spectrum const& c, float const& t) {
 	return t * c;
 }
@@ -82,6 +87,18 @@ inline Spectrum operator*(Spectrum const& c, Spectrum const& d) {
 
 inline Spectrum operator/(Spectrum const& c, float const& t) {
 	return c * (1/t);
+}
+
+Spectrum med(std::vector<Spectrum> array) {
+	std::vector<float> vr;
+	std::vector<float> vg;
+	std::vector<float> vb;
+	for (Spectrum sp : array) {
+		vr.push_back(sp.r);
+		vg.push_back(sp.g);
+		vb.push_back(sp.b);
+	}
+	return Spectrum(med(vr), med(vg), med(vb));
 }
 
 

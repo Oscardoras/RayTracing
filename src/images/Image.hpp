@@ -153,7 +153,7 @@ public:
 		for (int y = -s; y <= s; y++) {
 			std::vector<float> l;
 			for (int x = -s; x <= s; x++) {
-				l.push_back(std::exp( -(x*x + y*y) / (2*o*o) ) / (2*pi*o*o));
+				l.push_back(std::exp( -(x*x + y*y) / (2*o*o) ) / (2*Pi*o*o));
 			}
 			m.push_back(l);
 		}
@@ -169,22 +169,17 @@ public:
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				std::vector<float> vr;
-				std::vector<float> vg;
-				std::vector<float> vb;
+				std::vector<Color> v;
 
 				for (int j = 0; j < size; j++) {
 					for (int i = 0; i < size; i++) {
 						if (y-s+j >= 0 && y-s+j <= height-1 && x-s+i >= 0 && x-s+i <= width-1) {
-							Color c = pixels[y-s+j][x-s+i];
-							vr.push_back(c.r);
-							vg.push_back(c.g);
-							vb.push_back(c.b);
+							v.push_back(pixels[y-s+j][x-s+i]);
 						}
 					}
 				}
 				
-				filtered[y][x] = Color(med(vr), med(vg), med(vb));
+				filtered[y][x] = med(v);
 			}
 		}
 

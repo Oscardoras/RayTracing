@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 
-constexpr float pi = 3.14;
+constexpr float Pi = 3.14;
 constexpr float NaN = std::numeric_limits<double>::signaling_NaN();
 constexpr float Infinite = std::numeric_limits<double>::infinity();
 

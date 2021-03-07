@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	static void th(std::mutex *lock, std::shared_ptr<std::vector<int>> lines, Rendering *rendering, std::shared_ptr<World> world, Point position, Point corner, Vector horizontal, Vector vertical, bool half, int samplesPerPixel, int maxDepth) {
+	static void threadRender(std::mutex *lock, std::vector<int> *lines, Rendering *rendering, std::shared_ptr<World> world, Point position, Point corner, Vector horizontal, Vector vertical, bool half, int samples, int maxDepth) {
 		while (!lines->empty()) {
 			lock->lock();
 			int y;
@@ -41,105 +41,105 @@ protected:
 			} else break;
 			lock->unlock();
 
-			for (int x = 0; x < rendering->width; x++) {
-				if ((!half || x%2 == y%2)) {
-					float u = (x + random_double(-0.5, 0.5)) / (rendering->width-1);
-					float v = (y + random_double(-0.5, 0.5)) / (rendering->height-1);
-
-					Light light = Light();
-					for (int i = 0; i < samplesPerPixel; i++) {
-						Ray r(position, corner + u*horizontal + v*vertical - position);
-						light += world->trace(r, true, (!half || x%2 == y%2) ? samplesPerPixel : 1, maxDepth);
-					}
-					
-					lock->lock();
-					rendering->set(x, y, light/samplesPerPixel);
-					lock->unlock();
-				}
+			for (int x = 0; x < rendering->accurate.width; x++) {
+				float u = float(x) / (rendering->accurate.width-1);
+				float v = float(y) / (rendering->accurate.height-1);
+				Ray r(position, corner + u*horizontal + v*vertical - position);
+				Light light = world->trace(r, true, (!half || x%2 == y%2) ? samples : 1, maxDepth);
+				
+				lock->lock();
+				rendering->set(x, y, light);
+				lock->unlock();
 			}
 		}
 	}
 
-	static void complete(Rendering& rendering) {
-		Color **completed = new Color *[rendering.height];
-		for (int y = 0; y < rendering.height; y++) {
-			std::cout << "Completing line : " << y << std::endl;
-			completed[y] = new Color[rendering.width];
-			for (int x = 0; x < rendering.width; x++) {
-				long id = rendering.ids[y][x];
-				std::vector<float> vr;
-				std::vector<float> vg;
-				std::vector<float> vb;
+	static void threadComplete(std::mutex *lock, std::vector<int> *lines, Rendering *rendering, std::vector<Scatter> **completed) {
+		int const& width = rendering->accurate.width;
+		int const& height = rendering->accurate.height;
 
-				if (y%2 == x%2) {
-					Color c = rendering.scatterIllumination.pixels[y][x];
-					vr.push_back(c.r);
-					vg.push_back(c.g);
-					vb.push_back(c.b);
+		while (!lines->empty()) {
+			lock->lock();
+			int y;
+			if (!lines->empty()) {
+				y = lines->front();
+				std::cout << "Completing line : " << y << std::endl;
+				lines->erase(lines->begin());
+				completed[y] = new std::vector<Scatter>[width];
+			} else break;
+			lock->unlock();
 
-					if (y > 0 && x > 0 && rendering.ids[y-1][x-1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y-1][x-1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
+			for (int x = 0; x < width; x++) {
+				std::vector<Scatter> smooth;
+				for (Scatter scatter : rendering->smooth[y][x]) {
+					long const& id = scatter.id;
+					std::vector<Spectrum> v;
+
+					if (y%2 == x%2) {
+						v.push_back(scatter.scattered);
+
+						if (y > 0 && x > 0) {
+							for (Scatter s : rendering->smooth[y-1][x-1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+						if (y > 0 && x < width-1) {
+							for (Scatter s : rendering->smooth[y-1][x+1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+						if (y < height-1 && x < width-1) {
+							for (Scatter s : rendering->smooth[y+1][x+1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+						if (y < height-1 && x > 0) {
+							for (Scatter s : rendering->smooth[y+1][x-1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+					} else {
+						if (y > 0) {
+							for (Scatter s : rendering->smooth[y-1][x]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}																																																																																																																																																																						
+						if (x < width-1) {
+							for (Scatter s : rendering->smooth[y][x+1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+						if (y < height-1) {
+							for (Scatter s : rendering->smooth[y+1][x]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
+						if (x > 0) {
+							for (Scatter s : rendering->smooth[y][x-1]) if (s.id == id) {
+								v.push_back(s.scattered);
+								break;
+							}
+						}
 					}
-					if (y > 0 && x < rendering.width-1 && rendering.ids[y-1][x+1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y-1][x+1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					if (y < rendering.height-1 && x < rendering.width-1 && rendering.ids[y+1][x+1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y+1][x+1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					if (y < rendering.height-1 && x > 0 && rendering.ids[y+1][x-1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y+1][x-1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					completed[y][x] = Color(med(vr), med(vg), med(vb));
-				} else {
-					if (y > 0 && rendering.ids[y-1][x] == id) {
-						Color c = rendering.scatterIllumination.pixels[y-1][x];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}																																																																																																																																																																						
-					if (x < rendering.width-1 && rendering.ids[y][x+1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y][x+1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					if (y < rendering.height-1 && rendering.ids[y+1][x] == id) {
-						Color c = rendering.scatterIllumination.pixels[y+1][x];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					if (x > 0 && rendering.ids[y][x-1] == id) {
-						Color c = rendering.scatterIllumination.pixels[y][x-1];
-						vr.push_back(c.r);
-						vg.push_back(c.g);
-						vb.push_back(c.b);
-					}
-					completed[y][x] = Color(med(vr), med(vg), med(vb));
+					smooth.push_back(Scatter(id, scatter.albedo, med(v)));
 				}
+				lock->lock();
+				completed[y][x] = smooth;
+				lock->unlock();
 			}
 		}
-
-		for(int j = 0; j < rendering.height; j++) delete rendering.scatterIllumination.pixels[j];
-		delete rendering.scatterIllumination.pixels;
-		rendering.scatterIllumination.pixels = completed;
 	}
 
 public:
 
-	Rendering render(int t, bool half, int samplesPerPixel, int maxDepth) const {
+	Rendering render(int const& t, bool const& half, int const& samples, int const& maxDepth) const {
 		const int height = resolution;
 		const int width = static_cast<int>(resolution * ratio);
 
@@ -150,18 +150,36 @@ public:
 
 		Rendering rendering(width, height);
 
-		std::shared_ptr<std::vector<int>> lines = std::make_shared<std::vector<int>>();
-		for (int i = height-1; i >= 0; i--) lines->push_back(i);
+		std::vector<int> lines1 = std::vector<int>();
+		for (int i = height-1; i >= 0; i--) lines1.push_back(i);
 
 		std::vector<std::shared_ptr<std::thread>> threads;
 		std::mutex lock;
-		for (; t > 0; t--) {
-			threads.push_back(std::make_shared<std::thread>(Camera::th, &lock, lines, &rendering, world, position, corner, horizontal, vertical, half, samplesPerPixel, maxDepth));
-			//Camera::th(&lock, lines, &rendering, world, position, corner, horizontal, vertical, half, samplesPerPixel, maxDepth);
+		for (int i = 0; i < t; i++) {
+			threads.push_back(std::make_shared<std::thread>(Camera::threadRender, &lock, &lines1, &rendering, world, position, corner, horizontal, vertical, half, samples, maxDepth));
+			//Camera::threadRender(&lock, &lines1, &rendering, world, position, corner, horizontal, vertical, half, samples, maxDepth);
 		}
     	for (int i = 0; i < threads.size(); i++) threads[i]->join();
 
-		if (half) complete(rendering);
+		if (half) {
+			std::vector<Scatter> **completed = new std::vector<Scatter> *[height];
+
+			std::vector<int> lines2 = std::vector<int>();
+			for (int i = height-1; i >= 0; i--) lines2.push_back(i);
+
+			std::vector<std::shared_ptr<std::thread>> threads;
+			std::mutex lock;
+
+			for (int i = 0; i < t; i++) {
+				threads.push_back(std::make_shared<std::thread>(Camera::threadComplete, &lock, &lines2, &rendering, completed));
+				//Camera::threadComplete(&lock, &lines2, &rendering, completed);
+			}
+			for (int i = 0; i < threads.size(); i++) threads[i]->join();
+
+			for(int j = 0; j < height; j++) delete[] rendering.smooth[j];
+			delete[] rendering.smooth;
+			rendering.smooth = completed;
+		}
 
 		return rendering;
 	}

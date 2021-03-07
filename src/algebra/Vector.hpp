@@ -85,12 +85,16 @@ inline Vector operator-(Vector const& u, Vector const& v) {
 	return Vector(u.x - v.x, u.y - v.y, u.z - v.z);
 }
 
+
 inline Vector operator*(float const& t, Vector const& u) {
 	return Vector(t * u.x, t * u.y, t * u.z);
 }
 
 inline Vector operator*(Vector const& u, float const& t) {
 	return t * u;
+}
+inline Vector operator-(Vector const& v) {
+	return -1*v;
 }
 
 inline float operator*(Vector const& u, Vector const& v) {

@@ -8,11 +8,11 @@ int nbr = 0;
 #include "objects/Sphere.hpp"
 #include "objects/Triangle.hpp"
 #include "materials/Lambertian.hpp"
-//#include "materials/Metal.hpp"
-//#include "materials/Dielectric.hpp"
-//#include "materials/Lamp.hpp"
-//#include "materials/Marble.hpp"
-//#include "materials/Fog.hpp"
+#include "materials/Metal.hpp"
+#include "materials/Lamp.hpp"
+#include "materials/Dielectric.hpp"
+/*#include "materials/Marble.hpp"
+#include "materials/Fog.hpp"*/
 #include "textures/Plain.hpp"
 #include "textures/Tile.hpp"
 #include "textures/ImageTexture.hpp"
@@ -33,24 +33,30 @@ public:
 
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
-	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
+	std::vector<std::shared_ptr<Priority>> priorities = {
+		std::make_shared<Priority>(Point(0,0,-1.5), 0.5, 0.3),
+		std::make_shared<Priority>(Point(0,0,0), 0.5, 0.3)
+	};
 
+	//level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Lamp>(10.*Spectrum(1., 1., 1.))));
+
+	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5)/*, priorities*/)));
+
+
+	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Dielectric>(1.5)));
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("earthmap.jpg"), pi, pi/2))));
+	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2)/*, priorities*/)));
 	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
-	//level->add(std::make_shared<Sphere>(Point(1,0,-1), 0.5, std::make_shared<Dielectric>(Color(1., 1., 1.), 1.5)));
 	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Textured>()));
-	//level->add(std::make_shared<Sphere>(Point(0,0,100), 1, std::make_shared<Light>(25000.*Color(1., 1., 1.))));
-	//level->priorities.push_back(std::make_shared<Priority>(Point(0,0,100), 1));
 
 	level->sort(false);
 	//level->tree->print();
 	return level;
 }
 
-/*std::shared_ptr<World> getLevel2() {
+std::shared_ptr<World> getLevel2() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
 	
@@ -81,37 +87,29 @@ std::shared_ptr<World> getLevel() {
 	level->sort();
 	level->tree->print();
 	return level;
-}*/
+}
 
 int main() {
-	int maxRayPerPixel = 5;
-	Point pos = Point(-4, 1, 4);
-	//Point pos = Point(800, 5, 10);
-	Camera cam(getLevel(), pos, (Point(1,0,0.5) - pos).unit(), Vector(0,1,0), 720, 16./9.);
-	//cam.world->priority = 1.0;
+	int samples = 5;
+	Point pos = Point(-4, 1, 0);
+	Camera cam(getLevel(), pos, (Point() - pos).unit(), Vector(0,1,0), 720, 16./9.);
 
 	std::time_t t0 = std::time(nullptr);
-	Rendering rendering = cam.render(4, false, maxRayPerPixel, 20);
-	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;
+	Rendering rendering = cam.render(4, true, samples, 20);
 
-	rendering.scatterIllumination.save("images/raw_illumination.ppm");
-	rendering.scatterAlbedo.save("images/albedo.ppm");
-	rendering.addition.save("images/addition.ppm");
-	rendering.render(2.).save("images/raw.ppm");
-	std::cout << nbr << " rays" << std::endl;
+	Image raw = rendering.render(2.);
+	raw.save("images/raw.ppm");
 
-	//rendering.illumination.maximize();
-	rendering.homogenize(8, 6.);
-
-	rendering.scatterIllumination.save("images/illumination.ppm");
-
-	Image image = rendering.render(2.);
-	image.gaussian(3, 0.8);
+	Image image = rendering.render(2., 10, 9., 4);
+	//image.gaussian(3, 0.8);
 	image.save("images/image.ppm");
 
 	Image contour(image);
 	contour.contour_detection();
 	contour.save("images/image_contour.ppm");
+
+	std::cout << nbr << " rays" << std::endl;
+	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;
 
 	return 0;
 }

@@ -19,57 +19,6 @@ public:
 
 private:
 
-	/*bool hit(Ray const& r, float const& tMax) const {
-		if (r.direction.x != 0.) {
-			{
-				float t = (M.x - r.origin.x) / r.direction.x;
-				Point p = r.at(t);
-				if (m.y <= p.y && p.y <= M.y && m.z <= p.z && p.z <= M.z)
-					if (0 < t && t < tMax)
-						return true;
-			}
-			{
-				float t = (m.x - r.origin.x) / r.direction.x;
-				Point p = r.at(t);
-				if (m.y <= p.y && p.y <= M.y && m.z <= p.z && p.z <= M.z)
-					if (0 < t && t < tMax)
-						return true;
-			}
-		}
-		if (r.direction.y != 0.) {
-			{
-				float t = (M.y - r.origin.y) / r.direction.y;
-				Point p = r.at(t);
-				if (m.x <= p.x && p.x <= M.x && m.z <= p.z && p.z <= M.z)
-					if (0 < t && t < tMax)
-						return true;
-			}
-			{
-				float t = (m.y - r.origin.y) / r.direction.y;
-				Point p = r.at(t);
-				if (m.x <= p.x && p.x <= M.x && m.z <= p.z && p.z <= M.z)
-					if (0 < t && t < tMax)
-						return true;
-			}
-		}
-		if (r.direction.z != 0.) {
-			{
-				float t = (M.z - r.origin.z) / r.direction.z;
-				Point p = r.at(t);
-				if (m.x <= p.x && p.x <= M.x && m.y <= p.y && p.y <= M.y)
-					if (0 < t && t < tMax)
-						return true;
-			}
-			{
-				float t = (m.z - r.origin.z) / r.direction.z;
-				Point p = r.at(t);
-				if (m.x <= p.x && p.x <= M.x && m.y <= p.y && p.y <= M.y)
-					if (0 < t && t < tMax)
-						return true;
-			}
-		}
-		return false;
-	}*/
 	bool hit(Ray const& ray, float const& tMax) const {
 		{
 			float invD = 1. / ray.direction.x;
@@ -142,16 +91,16 @@ public:
 };
 
 
-bool xComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
-	return a->m.x <= b->m.x;
+bool xComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+	return a->m.x < b->m.x;
 }
 
-bool yComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
-	return a->m.y <= b->m.y;
+bool yComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+	return a->m.y < b->m.y;
 }
 
-bool zComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
-	return a->m.z <= b->m.z;
+bool zComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+	return a->m.z < b->m.z;
 }
 
 

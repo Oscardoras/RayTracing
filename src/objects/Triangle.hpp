@@ -7,6 +7,7 @@
 #include "../algebra/Point.hpp"
 #include "Object.hpp"
 #include "../materials/Material.hpp"
+#include "../Box.hpp"
 
 
 class Triangle: public Object {
@@ -27,7 +28,7 @@ public:
 		Vector AB = B-A;
 		Vector BC = C-B;
 		Vector CA = A-C;
-		V = cross(AB,BC);
+		V = cross(AB,BC).unit();
 		d = V*(A.toVector());
 		Vector AB_norm = AB.unit();
 		Vector BC_norm = BC.unit();
@@ -56,8 +57,8 @@ public:
 		return NaN;
 	}
 
-	virtual Light color(Ray const& ray, World const& world, int const& maxDepth) const override {
-		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -1*V, ray, world, maxDepth);
+	virtual Light color(Ray const& ray, World const& world, int const& remaningRays, int const& maxDepth) const override {
+		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -V, ray, world, remaningRays, maxDepth);
 	}
 
 	virtual Box getBox() const {
