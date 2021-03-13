@@ -25,7 +25,7 @@ public:
 		bool reflectIds = fuzziness < 0.1;
 		for (int i = 0; i < n; i++) {
 			Vector d = (ray.direction - 2*(ray.direction*faceDirection)*faceDirection + fuzziness*Vector::random()).unit();
-			light += world.trace(Ray(ray.origin, d), true, remaining, maxDepth);
+			light += world.trace(Ray(ray.origin, d), true, remaining, maxDepth).addId(long(this));
 		}
 
 		return light;

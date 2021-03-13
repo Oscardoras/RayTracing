@@ -3,7 +3,6 @@
 
 #include "Material.hpp"
 #include "../textures/Texture.hpp"
-#include "../World.hpp"
 #include "../Priority.hpp"
 
 
@@ -18,7 +17,12 @@ public:
 		Material(), texture(texture), priorities(priorities) {}
 	
 	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
-		float remaind = 1;
+		Spectrum scattered = Lambertian::getScattered(priorities, faceDirection, ray, world, samples, maxDepth);
+		return Light(long(this), texture->get(relative.u, relative.v).toSpectrum(), scattered);
+	}
+
+	static Spectrum getScattered(std::vector<std::shared_ptr<Priority>> priorities, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) {
+	float remaind = 1;
 		float probability = 1;
 		std::vector<Area> areas;
 
@@ -62,7 +66,7 @@ public:
 		spectrum *= probability;
 		for (Area area : areas) if (area.rays > 0) spectrum += area.probability*area.spectrum/area.rays;
 
-		return Light(long(this), texture->get(relative.u, relative.v).toSpectrum(), spectrum);
+		return spectrum;
 	}
 
 };

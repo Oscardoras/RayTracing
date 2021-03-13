@@ -61,11 +61,12 @@ public:
 		return *this;
 	}
 
-	inline void addId(int const& id) {
+	inline Light& addId(int const& id) {
 		for (Scatter& scatter : smooth) {
 			scatter.id += id;
 			scatter.id /= 2;
 		}
+		return *this;
 	}
 
 	inline Spectrum compute() const {

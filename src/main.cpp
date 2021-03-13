@@ -11,8 +11,9 @@ int nbr = 0;
 #include "materials/Metal.hpp"
 #include "materials/Lamp.hpp"
 #include "materials/Dielectric.hpp"
-/*#include "materials/Marble.hpp"
-#include "materials/Fog.hpp"*/
+#include "materials/Marble.hpp"
+#include "materials/Fog.hpp"
+#include "materials/Glossy.hpp"
 #include "textures/Plain.hpp"
 #include "textures/Tile.hpp"
 #include "textures/ImageTexture.hpp"
@@ -43,12 +44,13 @@ std::shared_ptr<World> getLevel() {
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5)/*, priorities*/)));
 
 
-	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Dielectric>(1.5)));
+	//level->add(std::make_shared<Sphere>(Point(1,0,-0.5), 0.5, std::make_shared<Dielectric>(1.5)));
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
+	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
 	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2)/*, priorities*/)));
-	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
+	level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
 	//level->add(std::make_shared<Sphere>(Point(-1,0,-1), 0.5, std::make_shared<Textured>()));
 
 	level->sort(false);
@@ -91,11 +93,11 @@ std::shared_ptr<World> getLevel2() {
 
 int main() {
 	int samples = 5;
-	Point pos = Point(-4, 1, 0);
-	Camera cam(getLevel(), pos, (Point() - pos).unit(), Vector(0,1,0), 720, 16./9.);
+	Point pos = Point(4, 1, -1);
+	Camera cam(getLevel(), pos, (Point(0,0,0) - pos).unit(), Vector(0,1,0), 720, 16./9.);
 
 	std::time_t t0 = std::time(nullptr);
-	Rendering rendering = cam.render(4, true, samples, 20);
+	Rendering rendering = cam.render(4, false, samples, 20);
 
 	Image raw = rendering.render(2.);
 	raw.save("images/raw.ppm");

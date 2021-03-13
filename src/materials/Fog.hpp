@@ -3,6 +3,7 @@
 
 #include <algorithm>
 
+#include "../algebra/Spectrum.hpp"
 #include "Material.hpp"
 #include "../World.hpp"
 
@@ -36,9 +37,12 @@ public:
 					else transmitted = Light();
 				}
 				float scatter = std::min(double(density*hit.t), 1.);
-				return Light(Spectrum(), transmitted*(1-scatter), Light(), albedo, scatter*scattered/std::max(1,scatterRays), long(this));
+				Light light = Light();
+				light += transmitted.addId(long(this) + 2)*(1-scatter);
+				light += Light(long(this) + 4, albedo*scatter, scattered/std::max(1,scatterRays));
+				return light;
 			} else {
-				return Light(world.infiniteColor(ray), Light(), Light(), Spectrum(), Spectrum(), long(this));
+				return Light(world.infiniteColor(ray));
 			}
 		} else {
 			return world.trace(ray, true, samples, maxDepth);
