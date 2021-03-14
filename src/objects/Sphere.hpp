@@ -54,6 +54,19 @@ public:
 		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), ray, world, samples, maxDepth);
 	}
 
+	virtual Point getPosition(RelativePosition const& relative) {
+		float theta = relative.u / radius;
+		float phi = relative.v / radius;
+
+		float sin = std::sin(phi - Pi/2);
+		float y = sin;
+		float xz_radius = (1 - sin*sin);
+		float x = std::cos(theta) * xz_radius;
+		float z = std::sin(theta) * xz_radius;
+
+		return center + radius*Vector(x, y, z);
+	}
+
 	virtual Box getBox() const {
 		Box box = Box(center + radius*Vector(1,1,1), center - radius*Vector(1,1,1));
 		box.objects.push_back(std::make_shared<Sphere>(*this));

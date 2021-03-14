@@ -16,6 +16,8 @@ public:
 
 	virtual Light color(Ray const& ray, World const& world, int const& samples, int const& maxDepth) const = 0;
 
+	virtual Point getPosition(RelativePosition const& relative) const = 0;
+
 	virtual Box getBox() const = 0;
 
 };

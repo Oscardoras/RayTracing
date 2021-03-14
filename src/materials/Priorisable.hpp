@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "algebra/Ray.hpp"
+#include "Material.hpp"
 
 
 class Priority {
@@ -41,6 +41,19 @@ public:
 	Area(std::shared_ptr<Priority> priority, Point origin): priority(priority), spectrum(), rays(0) {
 		probability = ( (Pi*priority->radius*priority->radius) / (priority->center - origin).lengthSquared() ) / (4*Pi*1*1);
 	}
+};
+
+
+class Priorisable: public Material {
+
+public:
+
+	std::vector<std::shared_ptr<Priority>> priorities;
+	std::shared_ptr<Texture> lightMap;
+
+	Priorisable(std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
+		Material(), priorities(priorities) {}
+
 };
 
 

@@ -61,6 +61,10 @@ public:
 		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -V, ray, world, remaningRays, maxDepth);
 	}
 
+	virtual Point getPosition(RelativePosition const& relative) {
+		return A + relative.u*CA_ort + relative.v*AB_ort;
+	}
+
 	virtual Box getBox() const {
 		Box box = Box(Point(), Point());
 		box.M.x = std::max(std::max(A.x, B.x), C.x);

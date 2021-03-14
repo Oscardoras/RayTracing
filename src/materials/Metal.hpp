@@ -11,10 +11,9 @@ class Metal: public Material {
 
 public:
 
-	Color albedo;
 	float fuzziness;
 
-	Metal(Color albedo, float fuzziness) : Material(), albedo(albedo), fuzziness(fuzziness) {}
+	Metal(Color albedo, float fuzziness) : Material(), fuzziness(fuzziness) {}
 
 	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
 		Light light = Light();

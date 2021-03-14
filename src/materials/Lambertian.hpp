@@ -1,20 +1,18 @@
 #ifndef MATERIALS_LAMBERTIAN_H_
 #define MATERIALS_LAMBERTIAN_H_
 
-#include "Material.hpp"
+#include "Priorisable.hpp"
 #include "../textures/Texture.hpp"
-#include "../Priority.hpp"
 
 
-class Lambertian: public Material {
+class Lambertian: public Priorisable {
 
 public:
 
 	std::shared_ptr<Texture> texture;
-	std::vector<std::shared_ptr<Priority>> priorities;
 
 	Lambertian(std::shared_ptr<Texture> texture, std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
-		Material(), texture(texture), priorities(priorities) {}
+		Priorisable(priorities), texture(texture) {}
 	
 	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
 		Spectrum scattered = Lambertian::getScattered(priorities, faceDirection, ray, world, samples, maxDepth);
