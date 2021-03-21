@@ -15,7 +15,7 @@ public:
 	Spectrum albedo;
 	Spectrum scattered;
 
-	Scatter(int id, Spectrum albedo, Spectrum scattered): id(id), albedo(albedo), scattered(scattered) {}
+	Scatter(int const& id, Spectrum const& albedo, Spectrum const& scattered): id(id), albedo(albedo), scattered(scattered) {}
 
 };
 
@@ -28,7 +28,7 @@ public:
 	std::vector<Scatter> smooth;
 
 	Light() {}
-	Light(int const& id, Spectrum const& albedo, Spectrum const& scattered) {
+	Light(int id, Spectrum albedo, Spectrum scattered) {
 		smooth.push_back(Scatter(id, albedo, scattered));
 	}
 	Light(Scatter const& scatter) {
@@ -46,13 +46,13 @@ public:
 
 	inline Light& operator*=(float const& t) {
 		accurate *= t;
-		for (Scatter& scatter : smooth) scatter.albedo *= t;
+		for (Scatter &scatter : smooth) scatter.albedo *= t;
 		return *this;
 	}
 
 	inline Light& operator*=(Spectrum const& s) {
 		accurate *= s;
-		for (Scatter& scatter : smooth) scatter.albedo *= s;
+		for (Scatter &scatter : smooth) scatter.albedo *= s;
 		return *this;
 	}
 
@@ -62,7 +62,7 @@ public:
 	}
 
 	inline Light& addId(int const& id) {
-		for (Scatter& scatter : smooth) {
+		for (Scatter &scatter : smooth) {
 			scatter.id += id;
 			scatter.id /= 2;
 		}

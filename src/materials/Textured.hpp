@@ -25,7 +25,7 @@ public:
 
 	Textured() : Material() {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
 		int const& u = relative.u;
 		int const& v = relative.v;
 
@@ -38,7 +38,7 @@ public:
 			Vector vec;
 			do vec = faceDirection + fuzz*Vector::random();
 			while (vec*faceDirection < 0);
-			Light lightData = world.trace(Ray(ray.origin, vec.unit()), true, remaining, maxDepth);
+			Light lightData = world.trace(Ray(ray.p, vec.unit()), true, remaining, maxDepth);
 			reflection += lightData.illumination*lightData.albedo + lightData.emmited;
 		}
 

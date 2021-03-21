@@ -29,10 +29,6 @@ public:
 		return *this;
 	}
 
-	inline Vector toVector() const {
-		return Vector(x, y, z);
-	}
-
 };
 
 inline Point operator+(Point const& a, Vector const& u) {
@@ -45,11 +41,6 @@ inline Point operator-(Point const& a, Vector const& u) {
 
 inline Vector operator-(Point const& a, Point const& b) {
 	return Vector(a.x - b.x, a.y - b.y, a.z - b.z);
-}
-
-
-inline Point Vector::toPoint() const {
-	return Point(x, y, z);
 }
 
 

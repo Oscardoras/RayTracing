@@ -51,7 +51,7 @@ public:
 		return *this;
 	}
 
-	inline float toBlackAndWhite() {
+	inline float toBlackAndWhite() const {
 		return (r+g+b)/3;
 	}
 
@@ -87,7 +87,7 @@ inline Color operator/(Color const& c, float const& t) {
 	return c * (1/t);
 }
 
-Color med(std::vector<Color> array) {
+Color med(std::vector<Color> &array) {
 	std::vector<float> vr;
 	std::vector<float> vg;
 	std::vector<float> vb;

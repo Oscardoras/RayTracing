@@ -29,7 +29,7 @@ public:
 		Vector BC = C-B;
 		Vector CA = A-C;
 		V = cross(AB,BC).unit();
-		d = V*(A.toVector());
+		d = V*(A - Point());
 		Vector AB_norm = AB.unit();
 		Vector BC_norm = BC.unit();
 		Vector CA_norm = CA.unit();
@@ -39,9 +39,9 @@ public:
 	}
 
 	virtual float hit(Ray const& r, float const& tMin, float const& tMax, bool const& in) const {
-		float l = V * r.direction;
+		float l = V * r.v;
 		if (l != 0.) {
-			float t = (d - V * (r.origin.toVector())) / l;
+			float t = (d - V * (r.p - Point())) / l;
 			if (tMin < t && t < tMax) {
 				Point p = r.at(t);
 				if ((p-A)*AB_ort > 0) {
@@ -57,8 +57,8 @@ public:
 		return NaN;
 	}
 
-	virtual Light color(Ray const& ray, World const& world, int const& remaningRays, int const& maxDepth) const override {
-		return material->color(RelativePosition(ray.origin - A, (ray.origin-A)*CA_ort, (ray.origin-A)*AB_ort), V*ray.direction < 0 ? V : -V, ray, world, remaningRays, maxDepth);
+	virtual Light color(Ray const& in, World const& world, int const& remaningRays, int const& maxDepth) const override {
+		return material->color(RelativePosition(in.p - A, (in.p-A)*CA_ort, (in.p-A)*AB_ort), V*in.v < 0 ? V : -V, in, world, remaningRays, maxDepth);
 	}
 
 	virtual Point getPosition(RelativePosition const& relative) {

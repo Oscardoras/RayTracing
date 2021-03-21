@@ -24,7 +24,7 @@ class Level: public World {
 public:
 
 	Spectrum infiniteColor(Ray const& r) const {
-		Vector unit_direction = r.direction.unit();
+		Vector unit_direction = r.v.unit();
 		float t = 0.5*(unit_direction.y + 1.0);
 		//return (1.0-t)*Spectrum(1.0, 1.0, 1.0) + t*Spectrum(0.5, 0.7, 1.0);
 		return Spectrum();

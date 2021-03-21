@@ -103,7 +103,7 @@ public:
 	Light trace(Ray const& ray, bool const& in, int const& samples, int const& maxDepth) const {
 		if (maxDepth > 0) {
 			Hit hit = this->hit(ray, in);
-			if (std::isfinite(hit.t)) return hit.object->color(Ray(ray.at(hit.t), ray.direction), *this, samples, maxDepth-1);
+			if (std::isfinite(hit.t)) return hit.object->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
 			else return Light(infiniteColor(ray));
 		} else return Light();
 	}

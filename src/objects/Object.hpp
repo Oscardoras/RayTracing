@@ -14,7 +14,7 @@ public:
 
 	virtual float hit(Ray const& r, float const& tMin, float const& tMax, bool const& in) const = 0;
 
-	virtual Light color(Ray const& ray, World const& world, int const& samples, int const& maxDepth) const = 0;
+	virtual Light color(Ray const& in, World const& world, int const& samples, int const& maxDepth) const = 0;
 
 	virtual Point getPosition(RelativePosition const& relative) const = 0;
 

@@ -13,7 +13,7 @@ public:
 
 	Lamp(Spectrum emitted) : Material(), emitted(emitted) {}
 
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
 		return Light(emitted);
 	}
 

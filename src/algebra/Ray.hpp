@@ -21,14 +21,14 @@ class Ray {
 
 public:
 
-	const Point origin;
-	const Vector direction;
+	Point p;
+	Vector v;
 
 	Ray() {}
-	Ray(Point const origin, Vector const direction): origin(origin), direction(direction) {}
+	Ray(Point p, Vector v): p(p), v(v) {}
 
-	inline Point at(float const t) const {
-		return origin + t*direction;
+	inline Point at(float const& t) const {
+		return p + t*v;
 	}
 
 };

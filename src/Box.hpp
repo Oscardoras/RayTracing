@@ -21,23 +21,23 @@ private:
 
 	bool hit(Ray const& ray, float const& tMax) const {
 		{
-			float invD = 1. / ray.direction.x;
-			float t1 = (m.x - ray.origin.x) * invD;
-			float t2 = (M.x - ray.origin.x) * invD;
+			float invD = 1. / ray.v.x;
+			float t1 = (m.x - ray.p.x) * invD;
+			float t2 = (M.x - ray.p.x) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
 			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
 		}
 		{
-			float invD = 1. / ray.direction.y;
-			float t1 = (m.y - ray.origin.y) * invD;
-			float t2 = (M.y - ray.origin.y) * invD;
+			float invD = 1. / ray.v.y;
+			float t1 = (m.y - ray.p.y) * invD;
+			float t2 = (M.y - ray.p.y) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
 			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
 		}
 		{
-			float invD = 1. / ray.direction.z;
-			float t1 = (m.z - ray.origin.z) * invD;
-			float t2 = (M.z - ray.origin.z) * invD;
+			float invD = 1. / ray.v.z;
+			float t1 = (m.z - ray.p.z) * invD;
+			float t2 = (M.z - ray.p.z) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
 			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
 		}

@@ -14,25 +14,25 @@ public:
 	Lambertian(std::shared_ptr<Texture> texture, std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
 		Priorisable(priorities), texture(texture) {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) const override {
-		Spectrum scattered = Lambertian::getScattered(priorities, faceDirection, ray, world, samples, maxDepth);
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
+		Spectrum scattered = Lambertian::getScattered(priorities, faceDirection, in, world, samples, maxDepth);
 		return Light(long(this), texture->get(relative.u, relative.v).toSpectrum(), scattered);
 	}
 
-	static Spectrum getScattered(std::vector<std::shared_ptr<Priority>> priorities, Vector const& faceDirection, Ray const& ray, World const& world, int const& samples, int const& maxDepth) {
-	float remaind = 1;
+	static Spectrum getScattered(std::vector<std::shared_ptr<Priority>> priorities, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) {
+		float remaind = 1;
 		float probability = 1;
 		std::vector<Area> areas;
 
 		for (std::shared_ptr<Priority> priority : priorities) {
-			Area area(priority, ray.origin);
-			remaind -= priority->portion;
+			Area area(priority, in.p);
+			remaind -= priority->importance;
 			probability -= area.probability;
-			int s = int(priority->portion*float(samples));
+			int s = int(priority->importance*float(samples));
 			for (int i = 0; i < s; i++) {
-				Vector vec = (priority->center + Vector::random()*priority->radius) - ray.origin;
+				Vector vec = (priority->center + Vector::random()*priority->radius) - in.p;
 				if (vec*faceDirection < 0) vec *= -1;
-				area.spectrum += world.trace(Ray(ray.origin, vec), true, 1, maxDepth).compute();
+				area.spectrum += world.trace(Ray(in.p, vec), true, 1, maxDepth).compute();
 				area.rays++;
 			}
 			areas.push_back(area);
@@ -46,7 +46,7 @@ public:
 			bool hit = false;
 			Vector vec = Vector::randomUnit();
 			if (vec*faceDirection < 0) vec *= -1;
-			Ray r = Ray(ray.origin, vec);
+			Ray r = Ray(in.p, vec);
 			for (Area area : areas) {
 				if (area.priority->hit(r)) {
 					hit = true;
