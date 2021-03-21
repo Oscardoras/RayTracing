@@ -12,9 +12,9 @@ public:
 
 	Point center;
 	float radius;
-	float portion;
+	float importance;
 
-	Priority(Point center, float radius, float portion) : center(center), radius(radius), portion(portion) {}
+	Priority(Point center, float radius, float importance) : center(center), radius(radius), importance(importance) {}
 
 	bool hit(Ray const& r) const {
 		Vector oc = r.origin - center;
@@ -53,6 +53,10 @@ public:
 
 	Priorisable(std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
 		Material(), priorities(priorities) {}
+	
+	static void getPDFDirection() {
+
+	}
 
 };
 
