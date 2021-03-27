@@ -16,8 +16,8 @@ public:
 
 	Dielectric(float ior) : Material(), ior(ior) {}
 
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& rinay, World const& world, int const& samples, int const& maxDepth) const override {
-		bool out = in.direction*faceDirection < 0.;
+	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
+		bool out = in.v*faceDirection < 0.;
 		float n1;
 		float n2;
 		if (out) {

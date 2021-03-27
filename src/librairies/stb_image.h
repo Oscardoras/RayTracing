@@ -780,7 +780,7 @@ typedef struct
    int callback_already_read;
 
    stbi_uc *img_buffer, *img_buffer_end;
-   stbi_uc *img_buffer_pal, *img_buffer_original_end;
+   stbi_uc *img_buffer_original, *img_buffer_original_end;
 } stbi__context;
 
 

@@ -8,7 +8,7 @@ int nbr = 0;
 #include "objects/Sphere.hpp"
 #include "objects/Triangle.hpp"
 #include "materials/Lambertian.hpp"
-#include "materials/Metal.hpp"
+#include "materials/SpecularMetal.hpp"
 #include "materials/Lamp.hpp"
 #include "materials/Dielectric.hpp"
 #include "materials/Marble.hpp"
@@ -26,7 +26,7 @@ public:
 	Spectrum infiniteColor(Ray const& r) const {
 		Vector unit_direction = r.v.unit();
 		float t = 0.5*(unit_direction.y + 1.0);
-		//return (1.0-t)*Spectrum(1.0, 1.0, 1.0) + t*Spectrum(0.5, 0.7, 1.0);
+		return (1.0-t)*Spectrum(1.0, 1.0, 1.0) + t*Spectrum(0.5, 0.7, 1.0);
 		return Spectrum();
 	}
 
@@ -35,11 +35,11 @@ public:
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	std::vector<std::shared_ptr<Priority>> priorities = {
-		std::make_shared<Priority>(Point(0,0,-1.5), 0.5, 0.3),
+		//std::make_shared<Priority>(Point(0,0,-1.5), 0.5, 0.8),
 		//std::make_shared<Priority>(Point(0,0,0), 0.5, 0.3)
 	};
 
-	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Lamp>(10.*Spectrum(1., 1., 1.))));
+	//level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Lamp>(10.*Spectrum(1., 1., 1.))));
 
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5), priorities)));
 
@@ -48,8 +48,9 @@ std::shared_ptr<World> getLevel() {
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	//level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Glossy>(5., std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2), priorities))));
+	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
+	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<SpecularMetal>(std::make_shared<Plain>(0.9, 0.9, 0.9), std::make_shared<Plain>(0.3, 0.3, 0.3))));
+	//level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Glossy>(5., std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2), priorities))));
 	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
 
 	level->sort(false);
@@ -57,7 +58,7 @@ std::shared_ptr<World> getLevel() {
 	return level;
 }
 
-std::shared_ptr<World> getLevel2() {
+/*std::shared_ptr<World> getLevel2() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
 	
@@ -88,7 +89,7 @@ std::shared_ptr<World> getLevel2() {
 	level->sort();
 	level->tree->print();
 	return level;
-}
+}*/
 
 int main() {
 	int samples = 5;
@@ -101,7 +102,7 @@ int main() {
 	Image raw = rendering.render(2.);
 	raw.save("images/raw.ppm");
 
-	Image image = rendering.render(2., 10, 9., 4);
+	Image image = rendering.render(2., 8, 4., 4);
 	//image.gaussian(3, 0.8);
 	image.save("images/image.ppm");
 

@@ -54,7 +54,7 @@ public:
 		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), in, world, samples, maxDepth);
 	}
 
-	virtual Point getPosition(RelativePosition const& relative) {
+	virtual Point getPosition(RelativePosition const& relative) const override {
 		float theta = relative.u / radius;
 		float phi = relative.v / radius;
 
@@ -67,7 +67,7 @@ public:
 		return center + radius*Vector(x, y, z);
 	}
 
-	virtual Box getBox() const {
+	virtual Box getBox() const override {
 		Box box = Box(center + radius*Vector(1,1,1), center - radius*Vector(1,1,1));
 		box.objects.push_back(std::make_shared<Sphere>(*this));
 		return box;

@@ -108,13 +108,13 @@ public:
 		} else return Light();
 	}
 
-	void lightMap(std::shared_ptr<Object> object, bool const& priorities, ImageTexture& texture, int const& samples, int const& maxDepth) {
+	/*void lightMap(std::shared_ptr<Object> object, bool const& priorities, ImageTexture& texture, int const& samples, int const& maxDepth) {
 		for (int y = 0; y < texture.image.height; y++) {
 			for (int x = 0; x < texture.image.width; x++) {
 				Point p = object->getPosition(RelativePosition(Vector(), x, y));
 			}
 		}
-	}
+	}*/
 
 };
 

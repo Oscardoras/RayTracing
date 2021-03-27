@@ -9,62 +9,19 @@ class Lambertian: public Priorisable {
 
 public:
 
-	std::shared_ptr<Texture> texture;
+	std::shared_ptr<Texture> albedo;
 
-	Lambertian(std::shared_ptr<Texture> texture, std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
-		Priorisable(priorities), texture(texture) {}
+	Lambertian(std::shared_ptr<Texture> albedo, std::vector<std::shared_ptr<Priority>> priorities = std::vector<std::shared_ptr<Priority>>()):
+		Priorisable(priorities), albedo(albedo) {}
 	
 	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
-		Spectrum scattered = Lambertian::getScattered(priorities, faceDirection, in, world, samples, maxDepth);
-		return Light(long(this), texture->get(relative.u, relative.v).toSpectrum(), scattered);
+		Spectrum scattered = scatter(faceDirection, in, world, samples, maxDepth);
+		return Light(long(this), albedo->get(relative.u, relative.v).toSpectrum(), scattered);
 	}
 
-	static Spectrum getScattered(std::vector<std::shared_ptr<Priority>> priorities, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) {
-		float remaind = 1;
-		float probability = 1;
-		std::vector<Area> areas;
-
-		for (std::shared_ptr<Priority> priority : priorities) {
-			Area area(priority, in.p);
-			remaind -= priority->importance;
-			probability -= area.probability;
-			int s = int(priority->importance*float(samples));
-			for (int i = 0; i < s; i++) {
-				Vector vec = (priority->center + Vector::random()*priority->radius) - in.p;
-				if (vec*faceDirection < 0) vec *= -1;
-				area.spectrum += world.trace(Ray(in.p, vec), true, 1, maxDepth).compute();
-				area.rays++;
-			}
-			areas.push_back(area);
-		}
-
-
-		Spectrum spectrum;
-		int rays = 0;
-		int s = int(remaind*float(samples));
-		for (int i = 0; i < s; i++) {
-			bool hit = false;
-			Vector vec = Vector::randomUnit();
-			if (vec*faceDirection < 0) vec *= -1;
-			Ray r = Ray(in.p, vec);
-			for (Area area : areas) {
-				if (area.priority->hit(r)) {
-					hit = true;
-					area.spectrum += world.trace(r, true, 1, maxDepth).compute();
-					area.rays++;
-				}
-			}
-			if (!hit) {
-				spectrum += world.trace(r, true, 1, maxDepth).compute();
-				rays++;
-			}
-		}
-
-		if (rays > 0) spectrum /= rays;
-		spectrum *= probability;
-		for (Area area : areas) if (area.rays > 0) spectrum += area.probability*area.spectrum/area.rays;
-
-		return spectrum;
+	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray &out, World const& world, int const& maxDepth) const override {
+		if (out.v*faceDirection < 0) out.v *= -1;
+		return world.trace(out, true, 1, maxDepth).compute();
 	}
 
 };

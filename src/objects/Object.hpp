@@ -8,6 +8,19 @@ class World;
 class Box;
 
 
+class RelativePosition {
+
+public:
+
+	Vector position;
+	float u;
+	float v;
+
+	RelativePosition(Vector const& position, float const& u, float const& v) : position(position), u(u), v(v) {}
+
+};
+
+
 class Object {
 
 public:

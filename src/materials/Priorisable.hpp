@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Material.hpp"
+#include "../textures/Texture.hpp"
 
 
 class Priority {
@@ -12,7 +13,7 @@ public:
 
 	Point center;
 	float radius;
-	float importance;
+	float importance; //Un nombre qui devrait être proportionelle à la part lumineuse de la priorité.
 
 	Priority(Point center, float radius, float importance): center(center), radius(radius), importance(importance) {}
 
@@ -38,7 +39,7 @@ class Area {
 public:
 
 	std::shared_ptr<Priority> priority;
-	float probability;
+	float probability; //Représente la surface angulaire de la zone par la surface d'une demi-sphère.
 	Spectrum spectrum;
 	int rays;
 
@@ -60,7 +61,7 @@ public:
 	
 	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray &out, World const& world, int const& maxDepth) const = 0;
 
-	Spectrum scatter(Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) {
+	Spectrum scatter(Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const {
 		float remaind = 1;
 		float probability = 1;
 		std::vector<Area> areas;
@@ -72,7 +73,8 @@ public:
 			int s = int(priority->importance*float(samples));
 			for (int i = 0; i < s; i++) {
 				Vector v = (priority->center + Vector::random()*priority->radius) - in.p;
-				area.spectrum += sample(faceDirection, in, Ray(in.p, v), world, maxDepth);
+				Ray out = Ray(in.p, v);
+				area.spectrum += sample(faceDirection, in, out, world, maxDepth);
 				area.rays++;
 			}
 			areas.push_back(area);
@@ -84,18 +86,17 @@ public:
 		int s = int(remaind*float(samples));
 		for (int i = 0; i < s; i++) {
 			bool hit = false;
-			Vector vec = Vector::randomUnit();
-			if (vec*faceDirection < 0) vec *= -1;
-			Ray r = Ray(in.p, vec);
+			Vector v = Vector::randomUnit();
+			Ray r = Ray(in.p, v);
 			for (Area area : areas) {
 				if (area.priority->hit(r)) {
 					hit = true;
-					area.spectrum += world.trace(r, true, 1, maxDepth).compute();
+					area.spectrum += sample(faceDirection, in, r, world, maxDepth);
 					area.rays++;
 				}
 			}
 			if (!hit) {
-				spectrum += world.trace(r, true, 1, maxDepth).compute();
+				spectrum += sample(faceDirection, in, r, world, maxDepth);
 				rays++;
 			}
 		}
