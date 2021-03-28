@@ -3,18 +3,17 @@
 
 #include <algorithm>
 
-#include "../algebra/Spectrum.hpp"
-#include "Material.hpp"
+#include "Priorisable.hpp"
 #include "../World.hpp"
 
-class Fog: public Material {
+class Fog: public Priorisable {
 
 public:
 
 	Spectrum albedo;
 	float density;
 
-	Fog(Spectrum albedo, float density) : Material(), albedo(albedo), density(density) {}
+	Fog(Spectrum albedo, float density) : Priorisable(), albedo(albedo), density(density) {}
 
 	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
 		if (in.v*faceDirection <= 0) {

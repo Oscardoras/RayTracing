@@ -201,6 +201,21 @@ public:
 		}
 	}
 
+	void average() {
+		Color color;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				color += pixels[y][x];
+			}
+		}
+		color /= (width*height);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				pixels[y][x] = color;
+			}
+		}
+	}
+
 	void contour_detection() {
 		std::vector<std::vector<float>> m {
 			std::vector<float> { -1., -1., -1., -1., -1. },

@@ -28,13 +28,12 @@ public:
 
 		int n = std::max(1, std::min(int(fuzziness * samples), samples));
 		int remaining = std::max(1, int(samples / n));
-		bool reflectIds = fuzziness < 0.1;
 		for (int i = 0; i < n; i++) {
 			Vector d = (in.v - 2*(in.v*faceDirection)*faceDirection + fuzziness*Vector::random()).unit();
 			light += world.trace(Ray(in.p, d), true, remaining, maxDepth);
 		}
 
-		return light;
+		return light/n;
 	}
 
 };

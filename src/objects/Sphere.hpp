@@ -22,7 +22,7 @@ public:
 		Vector oc = r.p - center;
 
 		float l2 = oc.lengthSquared();
-		//if (in && l2 + 0.01 < radius*radius) return 0;
+		if (in && l2 + 0.01 < radius*radius) return 0;
 
 		float a = r.v.lengthSquared();
 		float halfB = oc*r.v;
@@ -54,7 +54,7 @@ public:
 		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), in, world, samples, maxDepth);
 	}
 
-	virtual Point getPosition(RelativePosition const& relative) const override {
+	virtual Ray getSurface(RelativePosition const& relative) const override {
 		float theta = relative.u / radius;
 		float phi = relative.v / radius;
 
@@ -64,7 +64,8 @@ public:
 		float x = std::cos(theta) * xz_radius;
 		float z = std::sin(theta) * xz_radius;
 
-		return center + radius*Vector(x, y, z);
+		Point p = center + radius*Vector(x, y, z);
+		return Ray(p, (p - center).unit());
 	}
 
 	virtual Box getBox() const override {

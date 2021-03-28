@@ -41,9 +41,6 @@ public:
         float u = vec.x - floor(vec.x);
         float v = vec.y - floor(vec.y);
         float w = vec.z - floor(vec.z);
-        u = u*u*(3-2*u);
-        v = v*v*(3-2*v);
-        w = w*w*(3-2*w);
 
         int i = int(vec.x);
         int j = int(vec.y);
@@ -64,14 +61,14 @@ public:
     }
 
     double turb(Vector const& vec, int depth = 7) const {
-        float accum = 0.0;
+        float accum = 0.;
         Vector temp_p = vec;
-        float weight = 1.0;
+        float weight = 1.;
 
         for (int i = 0; i < depth; i++) {
             accum += weight*noise(temp_p);
             weight *= 0.5;
-            temp_p = temp_p *= 2;
+            temp_p *= 2;
         }
 
         return fabs(accum);

@@ -10,7 +10,7 @@ int nbr = 0;
 #include "materials/Lambertian.hpp"
 #include "materials/SpecularMetal.hpp"
 #include "materials/Lamp.hpp"
-#include "materials/Dielectric.hpp"
+#include "materials/SpecularDielectric.hpp"
 #include "materials/Marble.hpp"
 #include "materials/Fog.hpp"
 #include "materials/Glossy.hpp"
@@ -44,12 +44,13 @@ std::shared_ptr<World> getLevel() {
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5), priorities)));
 
 
-	//level->add(std::make_shared<Sphere>(Point(1,0,-0.5), 0.5, std::make_shared<Dielectric>(1.5)));
+	level->add(std::make_shared<Sphere>(Point(2,0,0), 0.5, std::make_shared<SpecularDielectric>(1.5)));
 	//level->add(std::make_shared<Rectangle>(-3, 0, 2, -2, 2, std::make_shared<Metal>(Color(1, 1, 1), 0.)));
 	//level->add(std::make_shared<Rectangle>(-2.01, -0.1, 2.1, -2.1, 2.1, std::make_shared<Lambertian>(std::make_shared<Noise>(4))));
 	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<SpecularMetal>(std::make_shared<Plain>(0.9, 0.9, 0.9), std::make_shared<Plain>(0.3, 0.3, 0.3))));
+	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 1., std::make_shared<Fog>(Spectrum(0.9,1,0.9), 0.5)));
+	level->add(std::make_shared<Sphere>(Point(0,0,0), 0.5, std::make_shared<Marble>(0.5*Vector(-1,-1,-1), Vector(1,0,-1), 7)));
+	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<SpecularMetal>(std::make_shared<Plain>(0.9, 0.9, 0.9), std::make_shared<Plain>(0.1, 0.1, 0.1))));
 	//level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Glossy>(5., std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2), priorities))));
 	//level->add(std::make_shared<Sphere>(Point(1,0,0.5), 1, std::make_shared<Fog>(Spectrum(1,1,1), 0.5)));
 
