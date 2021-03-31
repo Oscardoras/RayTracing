@@ -23,13 +23,13 @@ public:
 		return specularReflection(a, f, faceDirection, in, world, samples, maxDepth).addId(long(this));
 	}
 
-	static Light specularReflection(Spectrum const& albedo, float const& fuzziness, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) {
+	static Light specularReflection(Spectrum const& albedo, float const& fuzziness, Vector const& normal, Ray const& in, World const& world, int const& samples, int const& maxDepth) {
 		Light light = Light();
 
-		int n = std::max(1, std::min(int(fuzziness * samples), samples));
+		int n = std::max(1, std::min(int(fuzziness*10 * samples), samples));
 		int remaining = std::max(1, int(samples / n));
 		for (int i = 0; i < n; i++) {
-			Vector d = (in.v - 2*(in.v*faceDirection)*faceDirection + fuzziness*Vector::random()).unit();
+			Vector d = (in.v - 2*(in.v*normal)*normal + fuzziness*Vector::randomUnit()).unit();
 			light += world.trace(Ray(in.p, d), true, remaining, maxDepth);
 		}
 
