@@ -57,15 +57,17 @@ public:
 			n2 = 1.;
 		}
 		
-		Vector const& n = (out ? 1 : -1)*faceDirection;//.unit();
+		Vector const& n = (out ? 1 : -1)*faceDirection;
 		std::tuple<float, float> fd = SpecularDielectric::fresnelDescartes(n1, n2, n, in);
 		float fresnel = std::get<0>(fd);
+		float sin_theta = std::get<1>(fd);
 		float f = fuzziness->get(relative.u, relative.v).toBlackAndWhite();
 
 		Light light = Light();
-		light += material->color(relative, faceDirection, in, world, samples, maxDepth).addId(long(this) + 2) * (1-fresnel);
-		if (n1 < n2)
-			light += SpecularMetal::specularReflection(Spectrum(1,1,1), f, faceDirection, in, world, samples/2, maxDepth).addId(long(this) + 4) * fresnel;
+		if ((n1/n2)*sin_theta <= 1.)
+			light += material->color(relative, faceDirection, in, world, samples, maxDepth).addId(long(this) + 2) * (1-fresnel);
+		Spectrum reflected = SpecularMetal::specularReflection(Spectrum(1,1,1), f, faceDirection, in, world, samples/2, maxDepth).compute();
+		light += Light(long(this) + 4, Spectrum(1,1,1)*fresnel, reflected);
 		return light;
 	}
 

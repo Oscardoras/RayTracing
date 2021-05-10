@@ -19,8 +19,7 @@ public:
 		return Light(long(this), albedo->get(relative.u, relative.v).toSpectrum(), scattered);
 	}
 
-	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray &out, World const& world, int const& maxDepth) const override {
-		if (out.v*faceDirection < 0) out.v *= -1;
+	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray const& out, World const& world, int const& maxDepth) const override {
 		return world.trace(out, true, 1, maxDepth).compute();
 	}
 

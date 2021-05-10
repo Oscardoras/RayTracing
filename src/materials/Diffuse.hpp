@@ -2,7 +2,7 @@
 #define MATERIALS_DIFFUSE_H_
 
 #include "Priorisable.hpp"
-#include "../textures/Texture.hpp"
+#include "../textures/ImageTexture.hpp"
 
 
 class Area {
@@ -29,7 +29,7 @@ public:
 	Diffuse(std::vector<std::shared_ptr<Priority>> const& priorities = std::vector<std::shared_ptr<Priority>>()):
 		Priorisable(priorities) {}
 	
-	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray &out, World const& world, int const& maxDepth) const = 0;
+	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray const& out, World const& world, int const& maxDepth) const = 0;
 
 	Spectrum scatter(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const {
 		float remaind = 1;
@@ -81,6 +81,28 @@ public:
 		for (Area area : areas) if (area.rays > 0) spectrum += area.probability*area.spectrum/area.rays;
 
 		return spectrum;
+	}
+
+	void computeLightMap(std::shared_ptr<Object> const& object, World const& world, ImageTexture& texture, int const& samples, int const& maxDepth) const {
+		for (int y = 0; y < texture.image.height; y++) {
+			std::cout << "Computing line : " << y << std::endl;
+			for (int x = 0; x < texture.image.width; x++) {
+				Spectrum spectrum;
+				Ray surface = object->getSurface(RelativePosition(Vector(), x/texture.width, y/texture.height));
+				for (int i = 0; i < samples; i++) {
+					bool hit = false;
+					Vector vec = Vector::randomUnit();
+					if (vec*surface.v < 0) vec *= -1;
+					Ray r = Ray(surface.p, vec);
+					for (std::shared_ptr<Priority> priority : priorities) if (priority->hit(r)) {
+						hit = true;
+						break;
+					}
+					if (!hit) spectrum += world.trace(r, true, 1, maxDepth).compute();
+				}
+				texture.image.pixels[y][x] = (spectrum / samples).toColor();
+			}
+		}
 	}
 
 };
