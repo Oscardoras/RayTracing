@@ -61,6 +61,10 @@ public:
 		return material->color(RelativePosition(in.p - A, (in.p-A)*CA_ort, (in.p-A)*AB_ort), V*in.v < 0 ? V : -V, in, world, remaningRays, maxDepth);
 	}
 
+	virtual std::shared_ptr<ImageTexture> getTextureShape(Image const& image) const override {
+		return std::make_shared<ImageTexture>(image, abs((B-A)*CA_ort), abs((C-A)*AB_ort));
+	}
+
 	virtual Ray getSurface(RelativePosition const& relative) const override {
 		return Ray(A + relative.u*CA_ort + relative.v*AB_ort, Vector());
 	}

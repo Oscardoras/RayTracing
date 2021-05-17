@@ -38,7 +38,7 @@ public:
 				float scatter = std::min(double(density*hit.t), 1.);
 				Light light = Light();
 				light += transmitted.addId(long(this) + 2)*(1-scatter);
-				light += Light(long(this) + 4, albedo*scatter, scattered/std::max(1,scatterRays));
+				light += Light(long(this) + 4, 4, albedo*scatter, scattered/std::max(1, scatterRays));
 				return light;
 			} else {
 				return Light(world.infiniteColor(in));

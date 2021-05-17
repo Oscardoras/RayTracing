@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "../MathUtils.cpp"
+class Color;
 
 
 class Vector {
@@ -57,6 +58,8 @@ public:
 		float l = length();
 		return Vector(x / l, y / l, z / l);
 	}
+
+	inline Color toColor() const;
 
 	inline static Vector random(double const& min, double const& max) {
 		return Vector(random_double(min, max), random_double(min, max), random_double(min, max));

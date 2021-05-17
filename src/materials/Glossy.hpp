@@ -67,7 +67,7 @@ public:
 		if ((n1/n2)*sin_theta <= 1.)
 			light += material->color(relative, faceDirection, in, world, samples, maxDepth).addId(long(this) + 2) * (1-fresnel);
 		Spectrum reflected = SpecularMetal::specularReflection(Spectrum(1,1,1), f, faceDirection, in, world, samples/2, maxDepth).compute();
-		light += Light(long(this) + 4, Spectrum(1,1,1)*fresnel, reflected);
+		light += Light(long(this) + 4, 2, Spectrum(1,1,1)*fresnel, reflected);
 		return light;
 	}
 

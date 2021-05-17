@@ -47,11 +47,15 @@ public:
 
 		float xz_radius = Vector(oc.x, 0, oc.z).length();
 		float theta = std::acos(oc.x / xz_radius);
-		if (oc.z < 0) theta = -theta + 2*Pi;
+		if (oc.z > 0) theta = -theta + 2*Pi;
 
 		float phi = std::asin(oc.y / radius) + Pi/2;
 
 		return material->color(RelativePosition(oc, theta*radius, phi*radius), oc.unit(), in, world, samples, maxDepth);
+	}
+
+	virtual std::shared_ptr<ImageTexture> getTextureShape(Image const& image) const override {
+		return std::make_shared<ImageTexture>(image, 2*Pi*radius, Pi*radius);
 	}
 
 	virtual Ray getSurface(RelativePosition const& relative) const override {
@@ -60,7 +64,7 @@ public:
 
 		float sin = std::sin(phi - Pi/2);
 		float y = sin;
-		float xz_radius = (1 - sin*sin);
+		float xz_radius = sqrt(1 - sin*sin);
 		float x = std::cos(theta) * xz_radius;
 		float z = std::sin(theta) * xz_radius;
 

@@ -7,15 +7,16 @@
 #include "Spectrum.hpp"
 
 
-class Scatter {
+class Smooth {
 
 public:
 
 	int id;
+	int radius;
 	Spectrum albedo;
-	Spectrum scattered;
+	Spectrum light;
 
-	Scatter(int const& id, Spectrum const& albedo, Spectrum const& scattered): id(id), albedo(albedo), scattered(scattered) {}
+	Smooth(int const& id, int const& radius, Spectrum const& albedo, Spectrum const& light): id(id), radius(radius), albedo(albedo), light(light) {}
 
 };
 
@@ -24,35 +25,31 @@ class Light {
 
 public:
 
-	Spectrum accurate;
-	std::vector<Scatter> smooth;
+	std::vector<Smooth> smoothing;
 
 	Light() {}
-	Light(int id, Spectrum albedo, Spectrum scattered) {
-		smooth.push_back(Scatter(id, albedo, scattered));
+	Light(int id, int radius, Spectrum albedo, Spectrum light) {
+		smoothing.push_back(Smooth(id, radius, albedo, light));
 	}
-	Light(Scatter const& scatter) {
-		smooth.push_back(scatter);
+	Light(Smooth const& smooth) {
+		smoothing.push_back(smooth);
 	}
 	Light(Spectrum const& spectrum) {
-		accurate = spectrum;
+		smoothing.push_back(Smooth(0, 0, spectrum, Spectrum(1,1,1)));
 	}
 
 	inline Light& operator+=(Light const& l) {
-		accurate += l.accurate;
-		for (Scatter scatter : l.smooth) smooth.push_back(scatter);
+		for (Smooth smooth : l.smoothing) smoothing.push_back(smooth);
 		return *this;
 	}
 
 	inline Light& operator*=(float const& t) {
-		accurate *= t;
-		for (Scatter &scatter : smooth) scatter.albedo *= t;
+		for (Smooth &smooth : smoothing) smooth.albedo *= t;
 		return *this;
 	}
 
 	inline Light& operator*=(Spectrum const& s) {
-		accurate *= s;
-		for (Scatter &scatter : smooth) scatter.albedo *= s;
+		for (Smooth &smooth : smoothing) smooth.albedo *= s;
 		return *this;
 	}
 
@@ -62,16 +59,16 @@ public:
 	}
 
 	inline Light& addId(int const& id) {
-		for (Scatter &scatter : smooth) {
-			scatter.id += id;
-			scatter.id /= 2;
+		for (Smooth &smooth : smoothing) {
+			smooth.id += id;
+			smooth.id /= 2;
 		}
 		return *this;
 	}
 
 	inline Spectrum compute() const {
-		Spectrum value = accurate;
-		for (Scatter scatter : smooth) value += scatter.albedo * scatter.scattered;
+		Spectrum value = Spectrum();
+		for (Smooth smooth : smoothing) value += smooth.albedo * smooth.light;
 		return value;
 	}
 

@@ -2,6 +2,7 @@
 #define ALGEBRA_COLOR_H_
 
 #include "../MathUtils.cpp"
+#include "Vector.hpp"
 class Spectrum;
 
 
@@ -57,6 +58,10 @@ public:
 
 	inline Spectrum toSpectrum() const;
 
+	inline Vector toVector() const {
+		return Vector(r, g, b);
+	}
+
 };
 
 inline Color operator+(Color const& c, Color const& d) {
@@ -97,6 +102,11 @@ Color med(std::vector<Color> &array) {
 		vb.push_back(color.b);
 	}
 	return Color(med(vr), med(vg), med(vb));
+}
+
+
+inline Color Vector::toColor() const {
+	return Color(x, y, z);
 }
 
 

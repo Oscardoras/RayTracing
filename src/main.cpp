@@ -35,28 +35,30 @@ public:
 std::shared_ptr<World> getLevel() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	std::vector<std::shared_ptr<Priority>> priorities = {
-		//std::make_shared<Priority>(Point(0,0,-1.5), 0.5, 0.8),
-		//std::make_shared<Priority>(Point(0,0,0), 0.5, 0.3)
+		std::make_shared<Priority>(Point(-1,0,3), 0.5, 0.3)
 	};
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5), priorities)));
-	//level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<Lamp>(10.*Spectrum(1., 1., 1.))));
+	level->add(std::make_shared<Sphere>(Point(-1,0,3), 0.5, std::make_shared<Lamp>(25.*Spectrum(1., 1., 1.))));
+
+	level->add(std::make_shared<Sphere>(Point(-1,0,0), 0.5, std::make_shared<SpecularDielectric>(1.5, std::make_shared<Plain>(0.01, 0.01, 0.01))));
+	//level->add(std::make_shared<Sphere>(Point(4,0,-2), 1., std::make_shared<Fog>(Spectrum(1,1,1), 0.9)));
+	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 0.5, std::make_shared<SpecularMetal>(std::make_shared<Plain>(0.9, 0.9, 0.9), std::make_shared<Plain>(0,0,0))));
+	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Glossy>(std::make_shared<Plain>(2, 2, 2), std::make_shared<Plain>(0.4, 0.4, 0.4), std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2), priorities))));
+	level->add(std::make_shared<Triangle>(Point(4,0,-2), Point(4,4,0), Point(4,0,2), std::make_shared<Lambertian>(std::make_shared<Tile>(Color(1,1,1), Color(0,1,0), 0.5), priorities)));
 
 	std::shared_ptr<Diffuse> marble = std::make_shared<Marble>(0.5*Vector(-1,-1,-1), Vector(1,0,-1), 7);
-
-	level->add(std::make_shared<Sphere>(Point(2,0,0), 0.5, std::make_shared<SpecularDielectric>(1.5, std::make_shared<Plain>(0.01, 0.01, 0.01))));
-	//level->add(std::make_shared<Triangle>(Point(-2,3,-2), Point(2,0,-2), Point(2,0,3), std::make_shared<Marble>(Point(), Vector(1,0,-1), 7)));
-	level->add(std::make_shared<Sphere>(Point(0,0,-1.5), 1., std::make_shared<Fog>(Spectrum(0.9,1,0.9), 0.5)));
-	std::shared_ptr<Object> sphere = std::make_shared<Sphere>(Point(0,0,0), 0.5, marble);
+	std::shared_ptr<Object> sphere = std::make_shared<Sphere>(Point(1,0,0), 0.5, marble);
 	level->add(sphere);
-	//level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<SpecularMetal>(std::make_shared<Plain>(0.9, 0.9, 0.9), std::make_shared<Plain>(0.1, 0.1, 0.1))));
-	level->add(std::make_shared<Sphere>(Point(0,0,1.5), 0.5, std::make_shared<Glossy>(std::make_shared<Plain>(2, 2, 2), std::make_shared<Plain>(0.4, 0.4, 0.4), std::make_shared<Lambertian>(std::make_shared<ImageTexture>(Image("images/textures/earthmap.jpg"), Pi, Pi/2), priorities))));
 
 	level->sort(false);
 	//level->tree->print();
 
-	auto texture = ImageTexture(Image(100, 50), Pi, Pi/2);
-	marble->computeLightMap(sphere, *level, texture, 10, 20);
-	texture.image.save("images/marble.ppm");
+	//marble->lightMap = sphere->getTextureShape(Image("images/marble_color.ppm"));
+	//marble->lightDirection = sphere->getTextureShape(Image("images/marble_direction.ppm"));
+
+	/*marble->computeLightMap(sphere, *level, 1000, 500, 50, 20);
+	marble->lightMap->image.save("images/marble_color.ppm");
+	marble->lightDirection->image.save("images/marble_direction.ppm");*/
 
 	return level;
 }
@@ -96,19 +98,15 @@ std::shared_ptr<World> getLevel() {
 
 int main() {
 	auto level = getLevel();
-	int samples = 5;
+	int samples = 100;
 
-	/*Point pos = Point(4, 1, -1);
+	Point pos = Point(-4, 1, 1);
 	Camera cam(level, pos, (Point(0,0,0) - pos).unit(), Vector(0,1,0), 720, 16./9.);
 
 	std::time_t t0 = std::time(nullptr);
-	Rendering rendering = cam.render(4, false, samples, 20);
 
-	Image raw = rendering.render(2.);
-	raw.save("images/raw.ppm");
-
-	Image image = rendering.render(2., 8, 4., 4);
-	//image.gaussian(3, 0.8);
+	Image image = cam.render(4, 2., 2, false, samples, 20);
+	image.gaussian(3, 0.8);
 	image.save("images/image.ppm");
 
 	Image contour(image);
@@ -116,7 +114,7 @@ int main() {
 	contour.save("images/image_contour.ppm");
 
 	std::cout << nbr << " rays" << std::endl;
-	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;*/
+	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;
 
 	return 0;
 }

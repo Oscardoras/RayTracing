@@ -35,7 +35,7 @@ public:
 
 	Image(std::string const& path) {
 		const std::string ppm = ".ppm";
-		if (ppm.size() > path.size() && std::equal(ppm.rbegin(), ppm.rend(), path.rbegin())) {
+		if (path.size() > ppm.size() && std::equal(ppm.rbegin(), ppm.rend(), path.rbegin())) {
 			std::ifstream stream(path);
 			std::string line;
 			std::getline(stream, line);

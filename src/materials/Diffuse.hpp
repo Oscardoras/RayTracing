@@ -24,14 +24,15 @@ class Diffuse: public Priorisable {
 
 public:
 
-	std::shared_ptr<Texture> lightMap;
+	std::shared_ptr<ImageTexture> lightMap;
+	std::shared_ptr<ImageTexture> lightDirection;
 
-	Diffuse(std::vector<std::shared_ptr<Priority>> const& priorities = std::vector<std::shared_ptr<Priority>>()):
-		Priorisable(priorities) {}
+	Diffuse(std::vector<std::shared_ptr<Priority>> const& priorities = std::vector<std::shared_ptr<Priority>>(), std::shared_ptr<ImageTexture> const& lightMap = nullptr, std::shared_ptr<ImageTexture> const& lightDirection = nullptr):
+		Priorisable(priorities), lightMap(lightMap), lightDirection(lightDirection) {}
 	
-	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray const& out, World const& world, int const& maxDepth) const = 0;
+	virtual float scatterCoefficient(Vector const& normal, Ray const& in, Ray const& out) const = 0;
 
-	Spectrum scatter(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const {
+	Spectrum scatter(RelativePosition const& relative, Vector const& normal, Ray const& in, World const& world, int const& samples, int const& maxDepth) const {
 		float remaind = 1;
 		float probability = 1;
 		std::vector<Area> areas;
@@ -44,7 +45,7 @@ public:
 			for (int i = 0; i < s; i++) {
 				Vector v = (priority->center + Vector::random()*priority->radius) - in.p;
 				Ray r = Ray(in.p, v);
-				area.spectrum += sample(faceDirection, in, r, world, maxDepth);
+				area.spectrum += scatterCoefficient(normal, in, r) * world.trace(r, true, 1, maxDepth).compute();
 				area.rays++;
 			}
 			areas.push_back(area);
@@ -58,24 +59,26 @@ public:
 			for (int i = 0; i < s; i++) {
 				bool hit = false;
 				Vector vec = Vector::randomUnit();
-				if (vec*faceDirection < 0) vec *= -1;
+				if (vec*normal < 0) vec *= -1;
 				Ray r = Ray(in.p, vec);
+				Spectrum s = world.trace(r, true, 1, maxDepth).compute();
 				for (Area area : areas) {
 					if (area.priority->hit(r)) {
 						hit = true;
-						area.spectrum += world.trace(r, true, 1, maxDepth).compute();
+						area.spectrum += scatterCoefficient(normal, in, r) * s;
 						area.rays++;
 					}
 				}
 				if (!hit) {
-					spectrum += world.trace(r, true, 1, maxDepth).compute();
+					spectrum += scatterCoefficient(normal, in, r) * s;
 					rays++;
 				}
 			}
 
 			if (rays > 0) spectrum /= rays;
 		} else {
-			spectrum += lightMap->get(relative.u, relative.v).toSpectrum();
+			float coef = lightDirection != nullptr ? scatterCoefficient(normal, in, Ray(in.p, lightDirection->get(relative.u, relative.v).toVector())) : 1;
+			spectrum = coef * lightMap->get(relative.u, relative.v).toSpectrum();
 		}
 		spectrum *= probability;
 		for (Area area : areas) if (area.rays > 0) spectrum += area.probability*area.spectrum/area.rays;
@@ -83,12 +86,16 @@ public:
 		return spectrum;
 	}
 
-	void computeLightMap(std::shared_ptr<Object> const& object, World const& world, ImageTexture& texture, int const& samples, int const& maxDepth) const {
-		for (int y = 0; y < texture.image.height; y++) {
+	void computeLightMap(std::shared_ptr<Object> const& object, World const& world, int const& width, int const& height, int const& samples, int const& maxDepth) {
+		lightMap = object->getTextureShape(Image(width, height));
+		lightDirection = object->getTextureShape(Image(width, height));
+		for (int y = 0; y < height; y++) {
 			std::cout << "Computing line : " << y << std::endl;
-			for (int x = 0; x < texture.image.width; x++) {
+			for (int x = 0; x < width; x++) {
 				Spectrum spectrum;
-				Ray surface = object->getSurface(RelativePosition(Vector(), x/texture.width, y/texture.height));
+				Ray surface = object->getSurface(RelativePosition(Vector(), x*lightMap->width/width, y*lightMap->height/height));
+				Vector average = Vector();
+				Vector vectors[samples];
 				for (int i = 0; i < samples; i++) {
 					bool hit = false;
 					Vector vec = Vector::randomUnit();
@@ -98,9 +105,21 @@ public:
 						hit = true;
 						break;
 					}
-					if (!hit) spectrum += world.trace(r, true, 1, maxDepth).compute();
+					Spectrum s = Spectrum();
+					if (!hit) {
+						s = world.trace(r, true, 1, maxDepth).compute();
+						spectrum += s;
+					}
+
+					vectors[i] = s.getIntensity() * vec;
+					average += vectors[i];
 				}
-				texture.image.pixels[y][x] = (spectrum / samples).toColor();
+				lightMap->image.pixels[y][x] = (spectrum / samples).toColor();
+
+				average = average / samples;
+				float variance = 0;
+				for (int i = 0; i < samples; i++) variance += (average - vectors[i]).lengthSquared();
+				lightDirection->image.pixels[y][x] = (average * variance / average.length()).toColor();
 			}
 		}
 	}

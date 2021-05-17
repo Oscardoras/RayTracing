@@ -22,11 +22,11 @@ public:
 		Vector pos = origin + relative.position;
 		Spectrum albedo = Spectrum(1,1,1) * 0.5 * (1 + sin(4*(pos*direction) + 10*perlin.turb(pos)));
 		
-		return Light(long(this), albedo, scattered);
+		return Light(long(this), 3, albedo, scattered);
 	}
 
-	virtual Spectrum sample(Vector const& faceDirection, Ray const& in, Ray const& out, World const& world, int const& maxDepth) const override {
-		return world.trace(out, true, 1, maxDepth).compute();
+	virtual float scatterCoefficient(Vector const& faceDirection, Ray const& in, Ray const& out) const override {
+		return 1.;
 	}
 
 };
