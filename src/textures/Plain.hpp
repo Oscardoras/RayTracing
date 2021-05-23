@@ -11,13 +11,22 @@ class Plain: public Texture {
 
 public:
 
-	Color color;
+	Spectrum spectrum;
 
-	Plain(Color color): Texture(), color(color) {}
-	Plain(float r, float g, float b): Texture(), color(r, g, b) {}
+	Plain(Spectrum spectrum): Texture(), spectrum(spectrum) {}
+	Plain(float r, float g, float b): Texture(), spectrum(r, g, b) {}
+	Plain(float f): Texture(), spectrum(f,f,f) {}
 
-	virtual Color get(float const& u, float const& v) const override {
-		return color;
+	virtual Spectrum getSpectrum(RelativePosition const& relative) const override {
+		return spectrum;
+	}
+
+	virtual Vector getVector(RelativePosition const& relative) const override {
+		return spectrum.toColor().toVector();
+	}
+
+	virtual float getFloat(RelativePosition const& relative) const override {
+		return spectrum.getIntensity();
 	}
 
 };

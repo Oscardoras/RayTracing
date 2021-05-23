@@ -8,7 +8,7 @@
 
 class Perlin {
 
-private:
+protected:
 
     static const int point_count = 256;
     Vector* ranvec;
@@ -74,7 +74,7 @@ public:
         return fabs(accum);
     }
 
-private:
+protected:
 
     static double randseed(int t) {
         t = (t<<13) ^ t;

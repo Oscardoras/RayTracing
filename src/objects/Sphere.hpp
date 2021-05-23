@@ -15,8 +15,9 @@ public:
 	Point center;
 	float radius;
 	std::shared_ptr<Material> material;
+	Orientation orientation;
 
-	Sphere(Point center, float radius, std::shared_ptr<Material> material): Object(), center(center), radius(radius), material(material) {}
+	Sphere(Point center, float radius, std::shared_ptr<Material> material, Orientation orientation = Orientation()): Object(), center(center), radius(radius), material(material), orientation(orientation) {}
 
 	virtual float hit(Ray const& r, float const& tMin, float const& tMax, bool const& in) const {
 		Vector oc = r.p - center;
@@ -43,11 +44,13 @@ public:
 
 	virtual Light color(Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
 		Vector oc = in.p - center;
-		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, 0., 0.), Vector(), in, world, samples, maxDepth);
+		if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(RelativePosition(oc, NaN, NaN), Vector(), in, world, samples, maxDepth);
 
 		float xz_radius = Vector(oc.x, 0, oc.z).length();
 		float theta = std::acos(oc.x / xz_radius);
 		if (oc.z > 0) theta = -theta + 2*Pi;
+		theta += orientation.yaw;
+		theta -= 2*Pi*int(theta/(2*Pi));
 
 		float phi = std::asin(oc.y / radius) + Pi/2;
 
@@ -59,7 +62,7 @@ public:
 	}
 
 	virtual Ray getSurface(RelativePosition const& relative) const override {
-		float theta = relative.u / radius;
+		float theta = (relative.u / radius) - orientation.yaw;
 		float phi = relative.v / radius;
 
 		float sin = std::sin(phi - Pi/2);

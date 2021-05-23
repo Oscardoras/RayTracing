@@ -92,6 +92,7 @@ inline Vector operator*(float const& t, Vector const& u) {
 inline Vector operator*(Vector const& u, float const& t) {
 	return t * u;
 }
+
 inline Vector operator-(Vector const& v) {
 	return -1*v;
 }

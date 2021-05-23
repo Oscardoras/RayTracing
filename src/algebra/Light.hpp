@@ -35,7 +35,7 @@ public:
 		smoothing.push_back(smooth);
 	}
 	Light(Spectrum const& spectrum) {
-		smoothing.push_back(Smooth(0, 0, spectrum, Spectrum(1,1,1)));
+		smoothing.push_back(Smooth(0, 0, Spectrum(1,1,1), spectrum));
 	}
 
 	inline Light& operator+=(Light const& l) {

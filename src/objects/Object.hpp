@@ -3,10 +3,12 @@
 
 #include "../algebra/Ray.hpp"
 #include "../algebra/Light.hpp"
-#include "../textures/ImageTexture.hpp"
+#include "../algebra/Orientation.hpp"
+#include "../images/Image.hpp"
 
 class World;
 class Box;
+class ImageTexture;
 
 
 class RelativePosition {

@@ -11,16 +11,25 @@ class Tile: public Texture {
 
 public:
 
-	Color color1;
-	Color color2;
+	Spectrum spectrum1;
+	Spectrum spectrum2;
 	float size;
 
-	Tile(Color const& color1, Color const& color2, float const& size): Texture(), color1(color1), color2(color2), size(size) {}
+	Tile(Spectrum const& spectrum1, Spectrum const& spectrum2, float const& size): Texture(), spectrum1(spectrum1), spectrum2(spectrum2), size(size) {}
 
-	virtual Color get(float const& u, float const& v) const override {
-		int a = int(u / size);
-		int b = int(v / size);
-		return a%2 == b%2 ? color1 : color2;
+	virtual Spectrum getSpectrum(RelativePosition const& relative) const override {
+		if (std::isnan(relative.u) || std::isnan(relative.v)) return Spectrum();
+		int a = int(relative.u / size);
+		int b = int(relative.v / size);
+		return a%2 == b%2 ? spectrum1 : spectrum2;
+	}
+
+	virtual Vector getVector(RelativePosition const& relative) const override {
+		return getSpectrum(relative).toColor().toVector();
+	}
+
+	virtual float getFloat(RelativePosition const& relative) const override {
+		return getSpectrum(relative).getIntensity();
 	}
 
 };

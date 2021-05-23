@@ -52,11 +52,15 @@ public:
 	}
 
 	inline float getIntensity() const {
-		return r+g+b;
+		return (r+g+b)/3;
 	}
 
 	inline Color toColor() const {
 		return Color(r, g, b);
+	}
+
+	inline static Spectrum white() {
+		return Spectrum(1,1,1);
 	}
 
 };

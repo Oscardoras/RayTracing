@@ -62,6 +62,10 @@ public:
 		return Vector(r, g, b);
 	}
 
+	inline static Color white() {
+		return Color(1,1,1);
+	}
+
 };
 
 inline Color operator+(Color const& c, Color const& d) {
