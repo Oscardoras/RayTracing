@@ -1,6 +1,0 @@
-traitement_off : sans traitement d'image, 10 échantillons, 11 887 134 rays, 13s
-traitement_on : avec traitement 2, 10 échantillons, 11 824 843 rays, 19s
-traitement_compensation : sans traitement, 50 échantillons, 55 545 597 rays, 48s
-priorisation_off : sans priorisation, 10 échantillons, 11 689 361 rays, 14s
-priorisation_on : avec priorisation 0.3, 10 échantillons, 8 615 322 rays, 11s
-priorisation_compensation : sans priorisation, 100 échantillons, 108 805 846 rays, 95s

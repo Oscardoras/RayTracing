@@ -1,0 +1,10 @@
+\babel@toc {french}{}
+\beamer@sectionintoc {1}{Ray tracing}{3}{0}{1}
+\beamer@sectionintoc {2}{Physicaly based rendering}{6}{0}{2}
+\beamer@subsectionintoc {2}{1}{Radiométrie}{6}{0}{2}
+\beamer@subsectionintoc {2}{2}{Types d'interractions}{8}{0}{2}
+\beamer@subsectionintoc {2}{3}{Modéles physiques}{9}{0}{2}
+\beamer@sectionintoc {3}{Optimisation}{14}{0}{3}
+\beamer@subsectionintoc {3}{1}{Tests d'intersection}{14}{0}{3}
+\beamer@subsectionintoc {3}{2}{Priorisation}{16}{0}{3}
+\beamer@subsectionintoc {3}{3}{Traitement d'image}{18}{0}{3}

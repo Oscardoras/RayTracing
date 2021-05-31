@@ -16,28 +16,35 @@ class World {
 
 public:
 
-	std::vector<std::shared_ptr<Object>> objects;
+	std::vector<std::shared_ptr<Primitive>> primitives;
 	std::shared_ptr<Box> tree;
 
-	virtual Spectrum infiniteColor(Ray const& r) const = 0;
+	virtual Spectrum infiniteSpectrum(Ray const& r) const = 0;
+
+	virtual Spectrum maxDepthSpectrum(Ray const& r) const = 0;
 
 	void isEmpty() {
-		objects.empty();
+		primitives.empty();
 	}
 
 	void add(std::shared_ptr<Object> object) {
-		objects.push_back(object);
+		std::shared_ptr<Primitive> primitive = std::dynamic_pointer_cast<Primitive>(object);
+		if (primitive != nullptr) primitives.push_back(primitive);
+		else {
+			for (std::shared_ptr<Primitive> const& primitive : object->getPrimitives())
+				primitives.push_back(primitive);
+		}
 	}
 
 	void clear() {
-		objects.clear();
+		primitives.clear();
 	}
 
 protected:
 
-	virtual std::shared_ptr<Box> sort(std::vector<std::shared_ptr<Box>> boxes) {
+	virtual std::shared_ptr<Box> sort(std::vector<std::shared_ptr<Box>> boxes, bool const& recursive = true) {
 		std::shared_ptr<Box> box = std::make_shared<Box>();
-		for (const std::shared_ptr<Box> b : boxes) {
+		for (std::shared_ptr<Box> const& b : boxes) {
 			if (b->m.x < box->m.x) box->m.x = b->m.x;
 			if (b->M.x > box->M.x) box->M.x = b->M.x;
 			if (b->m.y < box->m.y) box->m.y = b->m.y;
@@ -46,92 +53,99 @@ protected:
 			if (b->M.z > box->M.z) box->M.z = b->M.z;
 		}
 		int size = boxes.size();
-		if (size <= 2) {
-			box->objects.push_back(boxes[0]->objects[0]);
-			box->objects.push_back(boxes[1]->objects[0]);
+		if (!recursive || size <= 2) {
+			for (std::shared_ptr<Box> const& b : boxes)
+				box->primitives.push_back(b->primitives[0]);
 		} else if (size == 3) {
-			box->objects.push_back(boxes[0]->objects[0]);
+			box->primitives.push_back(boxes[0]->primitives[0]);
 			std::vector<std::shared_ptr<Box>> second = std::vector<std::shared_ptr<Box>>();
 			second.push_back(boxes[1]);
 			second.push_back(boxes[2]);
-			box->boxes.push_back(sort(second));
+			box->boxes.push_back(sort(second, true));
 		} else {
-			int axis = random_int(1, 3);
-			auto comparator = axis == 1 ? xComparator : (axis == 2 ? yComparator : zComparator);
-			std::sort(boxes.begin(), boxes.end(), comparator);
-			int middle = size / 2;
-			std::vector<std::shared_ptr<Box>> first = std::vector<std::shared_ptr<Box>>();
-			for (int i = 0; i < middle; i++) first.push_back(boxes[i]);
-			box->boxes.push_back(sort(first));
-			std::vector<std::shared_ptr<Box>> second = std::vector<std::shared_ptr<Box>>();
-			for (int i = middle; i < size; i++) second.push_back(boxes[i]);
-			box->boxes.push_back(sort(second));
+			int axis;
+			float intersection = Infinite;
+			for (int ax = 1; ax <= 4; ax++) {
+				bool finish = (ax == 4);
+				if (finish) ax = axis;
+				auto comparator = ax == 1 ? xComparator : (ax == 2 ? yComparator : zComparator);
+				std::sort(boxes.begin(), boxes.end(), comparator);
+				int middle = size / 2;
+
+				std::vector<std::shared_ptr<Box>> f = std::vector<std::shared_ptr<Box>>();
+				for (int i = 0; i < middle; i++) f.push_back(boxes[i]);
+				std::shared_ptr<Box> first = sort(f, finish);
+
+				std::vector<std::shared_ptr<Box>> s = std::vector<std::shared_ptr<Box>>();
+				for (int i = middle; i < size; i++) s.push_back(boxes[i]);
+				std::shared_ptr<Box> second = sort(s, finish);
+
+				if (finish) {
+					box->boxes.push_back(first);
+					box->boxes.push_back(second);
+					break;
+				} else {
+					float a = first->M.x - second->m.x;
+					if (a < 0) a = first->m.x - second->M.x;
+					if (a < 0) a = 0;
+					float b = first->M.y - second->m.y;
+					if (b < 0) b = first->m.y - second->M.y;
+					if (b < 0) b = 0;
+					float c = first->M.z - second->m.z;
+					if (c < 0) c = first->m.z - second->M.z;
+					if (c < 0) c = 0;
+					float inter = a*b*c;
+					if (inter < intersection) {
+						axis = ax;
+						intersection = inter;
+					}
+				}
+				
+			}
 		}
 		return box;
 	}
 
 public:
 
-	virtual void sort(bool s = true) {
+	void sort(bool s = true) {
 		if (!s) tree = nullptr;
 		else {
 			std::vector<std::shared_ptr<Box>> boxes;
-			for (const std::shared_ptr<Object> object : objects) {
-				boxes.push_back(std::make_shared<Box>(object->getBox()));
+			for (std::shared_ptr<Primitive> const& primitive : primitives) {
+				std::shared_ptr<Box> box = std::make_shared<Box>(primitive->getBox());
+				box->primitives.push_back(primitive);
+				boxes.push_back(box);
 			}
 			tree = sort(boxes);
 		}
 	}
 
 	Hit hit(Ray const& ray, bool const& in) const {
+		constexpr float tMin = 0.001;
 		nbr++;
-		if (tree != nullptr) return tree->hit(ray, 0.001, Infinite, in);
+		if (tree != nullptr) return tree->hit(ray, tMin, Infinite, in);
 		else {
 			Hit hit;
 			hit.t = Infinite;
-			for (const std::shared_ptr<Object> object : objects) {
-				float t = object->hit(ray, 0.001, hit.t, in);
+			for (std::shared_ptr<Primitive> const& primitive : primitives) {
+				float t = primitive->hit(ray, tMin, hit.t, in);
 				if (!std::isnan(t) && t < hit.t) {
 					hit.t = t;
-					hit.object = object;
+					hit.primitive = primitive;
 				}
 			}
 			return hit;
 		}
 	}
 
-	Light trace(Ray const& ray, bool const& in, int const& samples, int const& maxDepth) const {
+	Light trace(Ray const& ray, bool const& inside, int const& samples, int const& maxDepth) const {
 		if (maxDepth > 0) {
-			Hit hit = this->hit(ray, in);
-			if (std::isfinite(hit.t)) return hit.object->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
-			else return Light(infiniteColor(ray));
-		} else return Light();
+			Hit hit = this->hit(ray, inside);
+			if (std::isfinite(hit.t)) return hit.primitive->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
+			else return Light(infiniteSpectrum(ray));
+		} else return Light(maxDepthSpectrum(ray));
 	}
-
-	/*void lightMap(std::shared_ptr<Object> const& object, std::vector<std::shared_ptr<Priority>> const& priorities, ImageTexture& texture, int const& samples, int const& maxDepth) {
-		for (int y = 0; y < texture.image.height; y++) {
-			for (int x = 0; x < texture.image.width; x++) {
-				Spectrum spectrum;
-
-				Ray surface = object->getSurface(RelativePosition(Vector(), x/texture.width, y/texture.height));
-				for (int i = 0; i < samples; i++) {
-					Vector v = Vector::randomUnit();
-					Ray r = Ray(surface.p, v);
-					if (r.v*surface.v < 0) r.v *= -1;
-					bool hit = false;
-					for (std::shared_ptr<Priority> priority : priorities) {
-						if (priority->hit(r)) {
-							hit = true;
-							break;
-						}
-					}
-					if (!hit) spectrum += trace(r, true, 1, maxDepth).compute();
-				}
-
-				texture.image.pixels[y][x] = (spectrum / samples).toColor();
-			}
-		}
-	}*/
 
 };
 

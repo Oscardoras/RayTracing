@@ -3,53 +3,40 @@
 
 #include "models/Lambertian.hpp"
 #include "models/Lamp.hpp"
-#include "models/SpecularDielectric.hpp"
-#include "models/SpecularMetal.hpp"
+#include "models/Metal.hpp"
 
 
-class BDF: public Lambertian {
+class BDF: public Lambertian, public Metal, public Lamp {
 
 public:
 
-	std::shared_ptr<Texture> albedo;
-	std::shared_ptr<Texture> reflection;
-	std::shared_ptr<Texture> roughness;
-	std::shared_ptr<Texture> ior;
 	std::shared_ptr<Texture> normal;
 
-	std::shared_ptr<ImageTexture> lightMap;
-	std::shared_ptr<ImageTexture> specularMap;
-
-	BDF(std::shared_ptr<Texture> albedo, std::vector<std::shared_ptr<Priority>> const& priorities = std::vector<std::shared_ptr<Priority>>(), std::shared_ptr<ImageTexture> const& lightMap = nullptr):
-		Lambertian(albedo, priorities, nullptr) {}
+	BDF(std::shared_ptr<Texture> diffuse, std::shared_ptr<Texture> reflection, std::shared_ptr<Texture> emmited, std::shared_ptr<Texture> roughness, std::shared_ptr<Texture> normal, std::vector<std::shared_ptr<Priority>> const& priorities = std::vector<std::shared_ptr<Priority>>(), std::shared_ptr<ImageTexture> const& lightMap = nullptr):
+		Lambertian(diffuse, priorities, lightMap), Metal(reflection, roughness), Lamp(emmited), normal(normal) {}
 	
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
-		Vector normal = faceDirection;
-		float ior = this->ior->getFloat(relative);
-		bool out = in.v*normal < 0.;
-		float n1;
-		float n2;
-		if (out) {
-			n1 = 1.;
-			n2 = ior;
-		} else {
-			n1 = ior;
-			n2 = 1.;
+	virtual Light color(RelativePosition const& relative, FaceDirection const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
+		Vector normal;
+		if (this->normal == nullptr) normal = faceDirection.w;
+		else {
+			Vector u = faceDirection.u;
+			Vector v = faceDirection.v();
+			Vector w = faceDirection.w;
+			Vector n = 2*this->normal->getVector(relative) - Vector(1,1,1);
+			normal = n.x*u + n.y*v + n.z*w;
 		}
-		
-		Vector const& n = (out ? 1 : -1)*normal;
-		std::tuple<float, float> fd = fresnelDescartes(n1, n2, n, in.v);
-		float fresnel = std::get<0>(fd);
-		float sin_theta = std::get<1>(fd);
-		float f = roughness->getFloat(relative);
+
+		Spectrum diffuse = this->diffuse->getSpectrum(relative);
+		Spectrum reflection = this->reflection->getSpectrum(relative);
+		float r = roughness->getFloat(relative);
+		Spectrum f = fresnel(reflection, normal, in.v);
 		int s = std::max(samples/2, 1);
+		int s2 = samples-s;
 
 		Light light = Light();
-		if ((n1/n2)*sin_theta <= 1.) {
-			Spectrum scattered = scatter(relative, normal, in, world, s, maxDepth) * (1-fresnel);
-			light += Light(long(this) + 2, 3, albedo->getSpectrum(relative), scattered);
-		}
-		light += reflection->getSpectrum(relative) * SpecularMetal::specularReflection(f, normal, in, world, s, maxDepth).addId(long(this) + 4) * fresnel;
+		if (!diffuse.isNull()) light += (Spectrum(1,1,1)-f) * Light(long(this), 3, diffuse, scatter(relative, normal, in, world, s, maxDepth));
+		if (!reflection.isNull() && s2 > 0) light += f * specular(true, r, specularRef(normal, in.v), in, world, s2, maxDepth).addId(long(this) + 4);
+		light += Light(emitted->getSpectrum(relative)).addId(long(this) + 6);
 
 		return light;
 	}

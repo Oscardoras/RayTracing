@@ -34,7 +34,7 @@ public:
 };
 
 
-class Priorisable: public Material {
+class Priorisable: public virtual Material {
 
 public:
 

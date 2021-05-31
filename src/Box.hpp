@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "algebra/Ray.hpp"
-#include "objects/Object.hpp"
+#include "objects/primitives/Primitive.hpp"
 
 
 class Box {
@@ -14,10 +14,10 @@ public:
 
 	Point M;
 	Point m;
-	std::vector<std::shared_ptr<Object>> objects;
+	std::vector<std::shared_ptr<Primitive>> primitives;
 	std::vector<std::shared_ptr<Box>> boxes;
 
-private:
+protected:
 
 	bool hit(Ray const& ray, float const& tMax) const {
 		{
@@ -25,21 +25,21 @@ private:
 			float t1 = (m.x - ray.p.x) * invD;
 			float t2 = (M.x - ray.p.x) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
-			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
+			if ((t2 < tMax ? t2 : tMax) < (t1 > 0 ? t1 : 0)) return false;
 		}
 		{
 			float invD = 1. / ray.v.y;
 			float t1 = (m.y - ray.p.y) * invD;
 			float t2 = (M.y - ray.p.y) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
-			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
+			if ((t2 < tMax ? t2 : tMax) < (t1 > 0 ? t1 : 0)) return false;
 		}
 		{
 			float invD = 1. / ray.v.z;
 			float t1 = (m.z - ray.p.z) * invD;
 			float t2 = (M.z - ray.p.z) * invD;
 			if (invD < 0.) std::swap(t1 , t2);
-			if ((t2 < tMax ? t2 : tMax) <= (t1 > 0 ? t1 : 0)) return false;
+			if ((t2 < tMax ? t2 : tMax) < (t1 > 0 ? t1 : 0)) return false;
 		}
 		return true;
 	}
@@ -47,21 +47,21 @@ private:
 public:
 
 	Box(): m(Point()), M(Point()) {}
-	Box(Point const& M, Point const& m): M(M), m(m) {}
+	Box(Point M, Point m): M(M), m(m) {}
 
-	Hit hit(Ray const& ray, float const& tMin, float const& tMax, bool const& in) const {
+	Hit hit(Ray const& ray, float const& tMin, float const& tMax, bool const& inside) const {
 		Hit hit;
 		hit.t = Infinite;
 		if (this->hit(ray, tMax)) {
-			for (const std::shared_ptr<Object> object : objects) {
-				float t = object->hit(ray, 0.001, hit.t, in);
+			for (std::shared_ptr<Primitive> const& primitive : primitives) {
+				float t = primitive->hit(ray, tMin, hit.t, inside);
 				if (!std::isnan(t) && t < hit.t) {
 					hit.t = t;
-					hit.object = object;
+					hit.primitive = primitive;
 				}
 			}
-			for (const std::shared_ptr<Box> box : boxes) {
-				Hit h = box->hit(ray, 0.001, hit.t, in);
+			for (std::shared_ptr<Box> const& box : boxes) {
+				Hit h = box->hit(ray, tMin, hit.t, inside);
 				if (!std::isnan(h.t) && h.t < hit.t) {
 					hit = h;
 				}
@@ -75,9 +75,9 @@ public:
 		std::cout << space << "{" << std::endl;
 		std::cout << space << "M:" << M.x << "," << M.y << "," << M.z << std::endl;
 		std::cout << space << "m:" << m.x << "," << m.y << "," << m.z << std::endl;
-		std::cout << space << "objects:[" << std::endl;
-		for (std::shared_ptr<Object> object : objects) {
-			std::cout << space << "object" << std::endl;
+		std::cout << space << "primitives:[" << std::endl;
+		for (std::shared_ptr<Primitive> primitive : primitives) {
+			std::cout << space << "primitive" << std::endl;
 		}
 		std::cout << space << "]" << std::endl;
 		std::cout << space << "boxes:[" << std::endl;
@@ -91,15 +91,15 @@ public:
 };
 
 
-bool xComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+bool xComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
 	return a->m.x < b->m.x;
 }
 
-bool yComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+bool yComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
 	return a->m.y < b->m.y;
 }
 
-bool zComparator(std::shared_ptr<Box> const a, std::shared_ptr<Box> const b) {
+bool zComparator(std::shared_ptr<Box> const& a, std::shared_ptr<Box> const& b) {
 	return a->m.z < b->m.z;
 }
 

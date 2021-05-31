@@ -3,7 +3,7 @@
 
 #include "../algebra/Vector.hpp"
 #include "../algebra/Spectrum.hpp"
-#include "../objects/Object.hpp"
+#include "../objects/primitives/Primitive.hpp"
 
 
 class Texture {

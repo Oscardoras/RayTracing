@@ -12,17 +12,20 @@ class ImageTexture: public Texture {
 
 public:
 
-    Image image;
+    std::shared_ptr<Image> image;
 	float width;
 	float height;
 
-	ImageTexture(Image image, float const& width, float const& height): Texture(), image(image), width(width), height(height) {}
+	ImageTexture(std::shared_ptr<Image> image, float width, float height):
+		Texture(), image(image), width(width), height(height) {}
 
 	Color get(float const& u, float const& v) const {
 		if (std::isnan(u) || std::isnan(v)) return Color();
-		int i = image.width - (int((u/width) * image.width) % image.width) -1;
-		int j = image.height - (int((v/height) * image.height) % image.height) -1;
-        return image.pixels[j][i];
+		int i = int((u/width) * image->width) % image->width;
+		int j = int((v/height) * image->height) % image->height;
+		if (i < 0) i += image->width;
+		if (j < 0) j += image->height;
+        return image->pixels[image->height-1-j][image->width-1-i];
 	}
 
 	virtual Spectrum getSpectrum(RelativePosition const& relative) const override {

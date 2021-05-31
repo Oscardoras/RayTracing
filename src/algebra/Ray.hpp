@@ -8,11 +8,11 @@
 #include "Point.hpp"
 #include "Vector.hpp"
 
-class Object;
+class Primitive;
 
 
 struct Hit {
-	std::shared_ptr<Object> object;
+	std::shared_ptr<Primitive> primitive;
 	float t;
 };
 

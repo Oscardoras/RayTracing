@@ -201,21 +201,6 @@ public:
 		}
 	}
 
-	void average() {
-		Color color;
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				color += pixels[y][x];
-			}
-		}
-		color /= (width*height);
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				pixels[y][x] = color;
-			}
-		}
-	}
-
 	void contour_detection() {
 		std::vector<std::vector<float>> m {
 			std::vector<float> { -1., -1., -1., -1., -1. },
@@ -226,6 +211,27 @@ public:
 		};
 
 		filtre(m);
+	}
+
+	Color getAverage() {
+		Color color;
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				color += pixels[y][x];
+			}
+		}
+		return color / (width*height);
+	}
+
+	static float difference(Image const& a, Image const& b) {
+		if (a.width != b.width || b.height != b.height) throw "The images do not have the same size.";
+		float sum = 0;
+		for (int y = 0; y < a.height; y++) {
+			for (int x = 0; x < a.width; x++) {
+				sum += abs((a.pixels[y][x] - b.pixels[y][x]).toBlackAndWhite());
+			}
+		}
+		return sum / (a.width*a.height);
 	}
 
 };

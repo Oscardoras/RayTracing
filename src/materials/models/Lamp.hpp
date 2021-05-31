@@ -5,7 +5,7 @@
 #include "../../World.hpp"
 
 
-class Lamp: public Material {
+class Lamp: public virtual Material {
 
 public:
 
@@ -13,7 +13,7 @@ public:
 
 	Lamp(std::shared_ptr<Texture> emitted) : Material(), emitted(emitted) {}
 
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
+	virtual Light color(RelativePosition const& relative, FaceDirection const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
 		return Light(emitted->getSpectrum(relative));
 	}
 

@@ -224,7 +224,7 @@ public:
 		std::mutex lock3;
 		for (int i = 0; i < t; i++) {
 			threads3.push_back(std::make_shared<std::thread>(Camera::threadGaussian, &lock3, &lines3, smoothing, &image, half, g, radius, sigma));
-			Camera::threadGaussian(&lock3, &lines3, smoothing, &image, half, g, radius, sigma);
+			//Camera::threadGaussian(&lock3, &lines3, smoothing, &image, half, g, radius, sigma);
 		}
 		for (int i = 0; i < threads3.size(); i++) threads3[i]->join();
 

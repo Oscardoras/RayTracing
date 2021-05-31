@@ -51,8 +51,19 @@ public:
 		return *this;
 	}
 
+	inline Spectrum& operator/=(Spectrum const& c) {
+		r /= c.r;
+		g /= c.g;
+		b /= c.b;
+		return *this;
+	}
+
 	inline float getIntensity() const {
 		return (r+g+b)/3;
+	}
+
+	inline bool isNull() {
+		return r <= 0. && g <= 0. && b <= 0.;
 	}
 
 	inline Color toColor() const {
@@ -91,6 +102,10 @@ inline Spectrum operator*(Spectrum const& c, Spectrum const& d) {
 
 inline Spectrum operator/(Spectrum const& c, float const& t) {
 	return c * (1/t);
+}
+
+inline Spectrum operator/(Spectrum const& c, Spectrum const& d) {
+	return Spectrum(c.r / d.r, c.g / d.g, c.b / d.b);
 }
 
 Spectrum med(std::vector<Spectrum> array) {

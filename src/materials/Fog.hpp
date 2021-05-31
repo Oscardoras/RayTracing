@@ -15,8 +15,8 @@ public:
 
 	Fog(Spectrum albedo, float density) : Priorisable(), albedo(albedo), density(density) {}
 
-	virtual Light color(RelativePosition const& relative, Vector const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
-		if (in.v*faceDirection <= 0) {
+	virtual Light color(RelativePosition const& relative, FaceDirection const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
+		if (in.v*faceDirection.w <= 0) {
 			Hit hit = world.hit(in, false);
 
 			if (std::isfinite(hit.t)) {
@@ -29,10 +29,10 @@ public:
 						scattered += world.trace(Ray(in.at(random_double(0, hit.t)), vec), false, 1, maxDepth).compute();
 					}
 
-					if (maxDepth > 1) transmitted = hit.object->color(Ray(in.at(hit.t), in.v), world, samples-scatterRays, maxDepth-1);
+					if (maxDepth > 1) transmitted = hit.primitive->color(Ray(in.at(hit.t), in.v), world, samples-scatterRays, maxDepth-1);
 					else transmitted = Light();
 				} else {
-					if (maxDepth > 1) transmitted = hit.object->color(Ray(in.at(hit.t), in.v), world, samples, maxDepth-1);
+					if (maxDepth > 1) transmitted = hit.primitive->color(Ray(in.at(hit.t), in.v), world, samples, maxDepth-1);
 					else transmitted = Light();
 				}
 				float scatter = std::min(double(density*hit.t), 1.);

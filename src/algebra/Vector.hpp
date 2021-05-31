@@ -61,12 +61,8 @@ public:
 
 	inline Color toColor() const;
 
-	inline static Vector random(double const& min, double const& max) {
-		return Vector(random_double(min, max), random_double(min, max), random_double(min, max));
-	}
-
 	inline static Vector random() {
-		return Vector::random(-1., 1.);
+		return Vector(random_double(-1, 1), random_double(-1, 1), random_double(-1, 1));
 	}
 
 	inline static Vector randomUnit() {
@@ -108,6 +104,22 @@ inline Vector cross(Vector const& u, Vector const& v) {
 inline Vector operator/(Vector const& u, float const& t) {
 	return (1/t) * u;
 }
+
+
+class Transformation {
+
+public:
+
+	std::shared_ptr<Transformation> transformation;
+
+	Transformation(std::shared_ptr<Transformation> transformation = nullptr): transformation(transformation) {}
+
+	virtual Vector transform(Vector const& vector) const {
+		if (transformation == nullptr) return vector;
+		else return transformation->transform(vector);
+	}
+
+};
 
 
 #endif
