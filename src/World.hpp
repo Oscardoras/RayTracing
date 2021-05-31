@@ -109,34 +109,18 @@ protected:
 public:
 
 	void sort(bool s = true) {
-		if (!s) tree = nullptr;
-		else {
-			std::vector<std::shared_ptr<Box>> boxes;
-			for (std::shared_ptr<Primitive> const& primitive : primitives) {
-				std::shared_ptr<Box> box = std::make_shared<Box>(primitive->getBox());
-				box->primitives.push_back(primitive);
-				boxes.push_back(box);
-			}
-			tree = sort(boxes);
+		std::vector<std::shared_ptr<Box>> boxes;
+		for (std::shared_ptr<Primitive> const& primitive : primitives) {
+			std::shared_ptr<Box> box = std::make_shared<Box>(primitive->getBox());
+			box->primitives.push_back(primitive);
+			boxes.push_back(box);
 		}
+		tree = sort(boxes, s);
 	}
 
 	Hit hit(Ray const& ray, bool const& in) const {
-		constexpr float tMin = 0.001;
 		nbr++;
-		if (tree != nullptr) return tree->hit(ray, tMin, Infinite, in);
-		else {
-			Hit hit;
-			hit.t = Infinite;
-			for (std::shared_ptr<Primitive> const& primitive : primitives) {
-				float t = primitive->hit(ray, tMin, hit.t, in);
-				if (!std::isnan(t) && t < hit.t) {
-					hit.t = t;
-					hit.primitive = primitive;
-				}
-			}
-			return hit;
-		}
+		return tree->hit(ray, 0.001, Infinite, in);
 	}
 
 	Light trace(Ray const& ray, bool const& inside, int const& samples, int const& maxDepth) const {

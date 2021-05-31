@@ -41,7 +41,7 @@ public:
 	}
 
 	virtual Spectrum maxDepthSpectrum(Ray const& r) const override {
-		return 0.*infiniteSpectrum(r);
+		return 0.171825*infiniteSpectrum(r);
 	}
 
 };
@@ -68,7 +68,7 @@ std::shared_ptr<World> getLevel1() {
 		std::make_shared<Plain>(getReflectance(1, 2)),
 		std::make_shared<Plain>(0),
 		std::make_shared<Plain>(0.4),
-		std::make_shared<Plain>(0,0,1),
+		nullptr,
 		priorities
 	), Orientation(Pi,0,0)));
 
@@ -81,8 +81,8 @@ std::shared_ptr<World> getLevel2() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5))));
 	
-	for (int a = -11; a < 11; a++) {
-        for (int b = -11; b < 11; b++) {
+	for (int a = -10; a < 10; a++) {
+        for (int b = -10; b < 10; b++) {
             auto choose_mat = random_double();
             Point center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
 
@@ -130,8 +130,6 @@ std::shared_ptr<World> getLevel3() {
 		std::make_shared<Priority>(Point(6,1.5,7), 0.5, 0.03),
 		std::make_shared<Priority>(Point(6,1.5,8), 0.5, 0.03)*/
 	};
-	//level->add(std::make_shared<Sphere>(Point(700,1000,500), 4.36, std::make_shared<Lamp>(std::make_shared<Plain>(360000))));
-	//level->add(std::make_shared<Sphere>(Point(0,3,0), 0.1, std::make_shared<Lamp>(std::make_shared<Plain>(1000))));
 
 	std::shared_ptr<Brick> brick = std::make_shared<Brick>(1,1);
 	std::shared_ptr<PaintedWall> painted = std::make_shared<PaintedWall>(1,1);
@@ -139,15 +137,15 @@ std::shared_ptr<World> getLevel3() {
 	std::shared_ptr<Ceiling> ceiling = std::make_shared<Ceiling>(1,1);
 	std::shared_ptr<Carpet> carpet = std::make_shared<Carpet>(1,1);
 
-	level->add(std::make_shared<Rectangle>(Point(5,1,-10), Point(5,0,-10), Point(5,0,10), brick));
-	level->add(std::make_shared<Rectangle>(Point(5,3,-10), Point(5,2,-10), Point(5,2,10), brick));
-	level->add(std::make_shared<Rectangle>(Point(5,3,-10), Point(5,0,-10), Point(5,0,-9), brick));
-	level->add(std::make_shared<Rectangle>(Point(5,3,9), Point(5,0,9), Point(5,0,10), brick));
+	level->add(std::make_shared<Rectangle>(Point(5,1,-10), Point(5,0,-10), Point(5,0,10), painted));
+	level->add(std::make_shared<Rectangle>(Point(5,3,-10), Point(5,2,-10), Point(5,2,10), painted));
+	level->add(std::make_shared<Rectangle>(Point(5,3,-10), Point(5,0,-10), Point(5,0,-9), painted));
+	level->add(std::make_shared<Rectangle>(Point(5,3,9), Point(5,0,9), Point(5,0,10), painted));
 
 	level->add(std::make_shared<Rectangle>(Point(-5,0,-10), Point(5,0,-10), Point(5,0,10), carpet));
-	level->add(std::make_shared<Rectangle>(Point(-5,0,-10), Point(5,0,-10), Point(5,3,-10), brick));
-	level->add(std::make_shared<Rectangle>(Point(-5,3,10), Point(5,3,10), Point(5,0,10), brick));
-	level->add(std::make_shared<Rectangle>(Point(-5,0,-10), Point(-5,3,-10), Point(-5,3,10), brick));
+	level->add(std::make_shared<Rectangle>(Point(-5,0,-10), Point(5,0,-10), Point(5,3,-10), painted));
+	level->add(std::make_shared<Rectangle>(Point(-5,3,10), Point(5,3,10), Point(5,0,10), painted));
+	level->add(std::make_shared<Rectangle>(Point(-5,0,-10), Point(-5,3,-10), Point(-5,3,10), painted));
 	level->add(std::make_shared<Rectangle>(Point(-5,3,-10), Point(5,3,-10), Point(5,3,10), ceiling));
 
 	level->add(std::make_shared<Rectangle>(Point(-3,1,-9.99), Point(3,1,-9.99), Point(3,2.5,-9.99), std::make_shared<Blackboard>(1,1,priorities)));
@@ -155,20 +153,21 @@ std::shared_ptr<World> getLevel3() {
 	level->add(std::make_shared<Parallelepiped>(Point(-2,0,-8), Point(2,0,-8), Point(2,1,-8), Point(2,1,-9), wood));
 	level->add(std::make_shared<Sphere>(Point(-1,1.25,-8.5), 0.25, std::make_shared<Gold>(1, 1, priorities)));
 	
-	level->sort(true);
+	level->sort(false);
 	//level->tree->print();
 	return level;
 }
 
 int main() {
-	auto level = getLevel1();
+	auto level = getLevel3();
 
-	Point pos = Point(-4, 1, 1);
-	Camera cam(level, pos, (Point()/*Point(0,1,-10)*/ - pos).unit(), Vector(0,1,0), 720, 16./9., 2.);
+	Point pos = /*Point(-4, 1, 1);*/Point(-3.5,1.8,-4);
+	Point dir = Point(0,1,-10);
+	Camera cam(level, pos, (dir - pos).unit(), Vector(0,1,0), 720, 16./9., 2.);
 
 	std::time_t t0 = std::time(nullptr);
 
-	Image image = cam.render(4, 2, 0.8, false, 50, 50);
+	Image image = cam.render(4, 2, 0.8, false, 25, 3);
 	image.gaussian(3, 0.8);
 	
 	std::cout << "average : " << image.getAverage().toBlackAndWhite() << std::endl;
