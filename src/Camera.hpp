@@ -69,7 +69,7 @@ protected:
 			int y;
 			if (!lines->empty()) {
 				y = lines->front();
-				std::cout << "Medianning line : " << y << std::endl;
+				std::cout << "Median line : " << y << std::endl;
 				lines->erase(lines->begin());
 			} else break;
 			lock->unlock();
@@ -110,7 +110,7 @@ protected:
 			int y;
 			if (!lines->empty()) {
 				y = lines->front();
-				std::cout << "Smoothing line : " << y << std::endl;
+				std::cout << "Gaussian line : " << y << std::endl;
 				lines->erase(lines->begin());
 			} else break;
 			lock->unlock();
@@ -172,7 +172,7 @@ protected:
 
 public:
 
-	Image render(int const& t, int const& radius, float const& sigma, bool const& half, int const& samples, int const& maxDepth) const {
+	Image render(int const& t, bool const& median, int const& radius, float const& sigma, bool const& half, int const& samples, int const& maxDepth) const {
 		const int height = resolution;
 		const int width = static_cast<int>(resolution * ratio);
 
@@ -205,16 +205,18 @@ public:
     	for (int i = 0; i < threads1.size(); i++) threads1[i]->join();
 
 
-		std::vector<int> lines2 = std::vector<int>();
-		for (int i = height-1; i >= 0; i--) lines2.push_back(i);
+		if (median || half) {
+			std::vector<int> lines2 = std::vector<int>();
+			for (int i = height-1; i >= 0; i--) lines2.push_back(i);
 
-		std::vector<std::shared_ptr<std::thread>> threads2;
-		std::mutex lock2;
-		for (int i = 0; i < t; i++) {
-			threads2.push_back(std::make_shared<std::thread>(Camera::threadMedian, &lock2, &lines2, smoothing, width, height, half));
-			//Camera::threadMedian(&lock2, &lines2, smoothing, width, height, half);
+			std::vector<std::shared_ptr<std::thread>> threads2;
+			std::mutex lock2;
+			for (int i = 0; i < t; i++) {
+				threads2.push_back(std::make_shared<std::thread>(Camera::threadMedian, &lock2, &lines2, smoothing, width, height, half));
+				//Camera::threadMedian(&lock2, &lines2, smoothing, width, height, half);
+			}
+			for (int i = 0; i < threads2.size(); i++) threads2[i]->join();
 		}
-		for (int i = 0; i < threads2.size(); i++) threads2[i]->join();
 
 
 		std::vector<int> lines3 = std::vector<int>();

@@ -56,12 +56,6 @@ protected:
 		if (!recursive || size <= 2) {
 			for (std::shared_ptr<Box> const& b : boxes)
 				box->primitives.push_back(b->primitives[0]);
-		} else if (size == 3) {
-			box->primitives.push_back(boxes[0]->primitives[0]);
-			std::vector<std::shared_ptr<Box>> second = std::vector<std::shared_ptr<Box>>();
-			second.push_back(boxes[1]);
-			second.push_back(boxes[2]);
-			box->boxes.push_back(sort(second, true));
 		} else {
 			int axis;
 			float intersection = Infinite;
@@ -81,8 +75,10 @@ protected:
 				std::shared_ptr<Box> second = sort(s, finish);
 
 				if (finish) {
-					box->boxes.push_back(first);
-					box->boxes.push_back(second);
+					if (f.size() == 1) box->primitives.push_back(first->primitives[0]);
+					else box->boxes.push_back(first);
+					if (s.size() == 1) box->primitives.push_back(second->primitives[0]);
+					else box->boxes.push_back(second);
 					break;
 				} else {
 					float a = first->M.x - second->m.x;
@@ -118,15 +114,15 @@ public:
 		tree = sort(boxes, s);
 	}
 
-	Hit hit(Ray const& ray, bool const& in) const {
+	Hit hit(Ray const& ray, bool const& inside) const {
 		nbr++;
-		return tree->hit(ray, 0.001, Infinite, in);
+		return tree->hit(ray, 0.001, Infinite, inside);
 	}
 
 	Light trace(Ray const& ray, bool const& inside, int const& samples, int const& maxDepth) const {
 		if (maxDepth > 0) {
 			Hit hit = this->hit(ray, inside);
-			if (std::isfinite(hit.t)) return hit.primitive->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
+			if (!std::isnan(hit.t)) return hit.primitive->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
 			else return Light(infiniteSpectrum(ray));
 		} else return Light(maxDepthSpectrum(ray));
 	}

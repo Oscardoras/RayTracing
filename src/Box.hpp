@@ -41,6 +41,7 @@ protected:
 			if (invD < 0.) std::swap(t1 , t2);
 			if ((t2 < tMax ? t2 : tMax) < (t1 > 0 ? t1 : 0)) return false;
 		}
+
 		return true;
 	}
 
@@ -52,7 +53,7 @@ public:
 	Hit hit(Ray const& ray, float const& tMin, float const& tMax, bool const& inside) const {
 		Hit hit;
 		hit.t = Infinite;
-		if (this->hit(ray, tMax)) {
+		if (true /*this->hit(ray, tMax)*/) {
 			for (std::shared_ptr<Primitive> const& primitive : primitives) {
 				float t = primitive->hit(ray, tMin, hit.t, inside);
 				if (!std::isnan(t) && t < hit.t) {

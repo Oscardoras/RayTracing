@@ -41,7 +41,7 @@ public:
 	}
 
 	virtual Spectrum maxDepthSpectrum(Ray const& r) const override {
-		return 0.171825*infiniteSpectrum(r);
+		return Spectrum();//0.171825*infiniteSpectrum(r);
 	}
 
 };
@@ -49,9 +49,9 @@ public:
 std::shared_ptr<World> getLevel1() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
 	std::vector<std::shared_ptr<Priority>> priorities = {
-		//std::make_shared<Priority>(Point(-1,0,3), 0.5, 0.5)
+		std::make_shared<Priority>(Point(-1,0,3), 0.5, 0.5)
 	};
-	//level->add(std::make_shared<Sphere>(Point(-1,0,3), 0.5, std::make_shared<Lamp>(std::make_shared<Plain>(25.*Spectrum(1., 1., 1.)))));
+	level->add(std::make_shared<Sphere>(Point(-1,0,3), 0.5, std::make_shared<Lamp>(std::make_shared<Plain>(25))));
 	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5), priorities)));
 
 	level->add(std::make_shared<Triangle>(Point(4,0,-2), Point(4,4,0), Point(4,0,2),
@@ -72,19 +72,20 @@ std::shared_ptr<World> getLevel1() {
 		priorities
 	), Orientation(Pi,0,0)));
 
-	level->sort(true);
+	level->sort(false);
+	//level->tree->print();
 
 	return level;
 }
 
 std::shared_ptr<World> getLevel2() {
 	std::shared_ptr<World> level = std::make_shared<Level>();
-	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5))));
+	level->add(std::make_shared<Sphere>(Point(0,-100.5,-1), 100, std::make_shared<Lambertian>(std::make_shared<Plain>(0.5, 0.5, 0.5))));
 	
 	for (int a = -10; a < 10; a++) {
         for (int b = -10; b < 10; b++) {
             auto choose_mat = random_double();
-            Point center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
+            Point center(a, 0.2, b);
 
             if ((center - Point(4, 0.2, 0)).length() > 0.9) {
                 std::shared_ptr<Material> sphere_material;
@@ -102,7 +103,7 @@ std::shared_ptr<World> getLevel2() {
         }
     }
 
-	level->sort(true);
+	level->sort(false);
 	//level->tree->print();
 	return level;
 }
@@ -162,23 +163,22 @@ int main() {
 	auto level = getLevel3();
 
 	Point pos = /*Point(-4, 1, 1);*/Point(-3.5,1.8,-4);
-	Point dir = Point(0,1,-10);
+	Point dir = /*Point();*/Point(0,1,-10);
 	Camera cam(level, pos, (dir - pos).unit(), Vector(0,1,0), 720, 16./9., 2.);
 
 	std::time_t t0 = std::time(nullptr);
 
-	Image image = cam.render(4, 2, 0.8, false, 25, 3);
+	Image image = cam.render(4, true, 2, 0.8, false, 100, 50);
 	image.gaussian(3, 0.8);
+
+	std::cout << nbr << " rays" << std::endl;
+	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;
 	
 	std::cout << "average : " << image.getAverage().toBlackAndWhite() << std::endl;
-	image.maximize();
 	image.save("images/image.ppm");
 	Image contour(image);
 	contour.contour_detection();
 	contour.save("images/image_contour.ppm");
-
-	std::cout << nbr << " rays" << std::endl;
-	std::cout << std::time(nullptr) - t0 << " seconds" << std::endl;
 
 	return 0;
 }

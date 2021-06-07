@@ -15,7 +15,7 @@ public:
 			std::make_shared<ImageTexture>(std::make_shared<Image>("images/textures/1K-blackboard/1K-blackboard-diffuse.jpg"), width, height),
 			std::make_shared<ImageTexture>(std::make_shared<Image>("images/textures/1K-blackboard/1K-blackboard-specular.jpg"), width, height),
 			std::make_shared<Plain>(0),
-			std::make_shared<Plain>(0.3),
+			std::make_shared<Plain>(0.1),
 			nullptr,
 			priorities,
 			lightMap
