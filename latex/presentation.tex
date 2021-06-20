@@ -17,7 +17,7 @@
 
 \graphicspath{ {./images/} }
 
-\title{Synthèse d’image 3D}
+\title{Synthèse d’images 3D}
 \subtitle{TIPE}
 \author{Oscar Buon}
 
@@ -172,14 +172,14 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{N'échantillone pas la source lumineuse}
+    \frametitle{N'échantillonne pas la source lumineuse}
     \begin{figure}
         \includegraphics[scale=0.3]{Priority1.png}
     \end{figure}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Echantillone la source lumineuse}
+    \frametitle{Échantillonne la source lumineuse}
     \begin{figure}
         \includegraphics[scale=0.3]{Priority2.png}
     \end{figure}
@@ -209,7 +209,7 @@
 
 \begin{frame}
     \frametitle{Idée}
-    Produire une image plus rapidemment mais de moins bonne qualité, pour ensuite l'améliorer avec des algorithmes de traitement d'image.
+    Produire une image plus rapidement mais de moins bonne qualité, pour ensuite l'améliorer avec des algorithmes de traitement d'images.
 \end{frame}
 
 \begin{frame}
@@ -247,7 +247,7 @@
 
     \begin{itemize}
         \item On sépare l'image en deux parties : la couleur propre des objets et leur illumination.
-        \item On applique un filtrage à seulement à l'illumination :
+        \item On applique un filtrage à l'illumination seulement  :
         \begin{itemize}
             \item Filtre médian : pour chaque pixel, on prend la médiane des pixels voisins.
             \item Filtre gaussien : chaque pixel est moyenné avec ses voisins avec un coefficient
@@ -344,7 +344,7 @@
         \item L'implémentation de l'algorithme fonctionne.
         \item Il est possible de l'utiliser dans le domaine de l'architecture.
         \item
-            Le programme a pu être optimisé, cependant pas suffisament pour être utilisé en temps réel.
+            Le programme a pu être optimisé, cependant pas suffisamment pour être utilisé en temps réel.
             Il existe tout de même plusieurs pistes d'améliorations :
             \begin{itemize}
                 \item utiliser l'accélération matérielle ;
@@ -397,7 +397,7 @@
 
 \begin{frame}
 
-    \frametitle{Equation de rendu}
+    \frametitle{Équation de rendu}
 
     \begin{align*}
         L_o(x, \omega_o, \lambda, t)
@@ -438,7 +438,7 @@
 \end{frame}
 
 \begin{frame}
-    On peut modéliser une surface réflexive réelle avec un nombre restrient de paramètres :
+    On peut modéliser une surface réflexive réelle avec un nombre restreint de paramètres :
     \begin{itemize}
         \item Spectre diffus
         \item Spectre spéculaire
