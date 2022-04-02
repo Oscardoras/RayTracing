@@ -2,14 +2,16 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "C/C++: g++ build active file",
+            "label": "C/C++: g++ build program",
             "command": "/usr/bin/g++",
             "args": [
                 "-g",
+                "-Wall",
+                "-Wextra",
                 "-pthread",
-                "${file}",
+                "${workspaceFolder}/src/main",
                 "-o",
-                "${workspaceFolder}/src/main"
+                "${workspaceFolder}/prog"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
