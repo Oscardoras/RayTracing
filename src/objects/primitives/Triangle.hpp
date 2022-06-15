@@ -4,10 +4,9 @@
 #include <memory>
 #include <algorithm>
 
-#include "../../algebra/Point.hpp"
 #include "Primitive.hpp"
 #include "../../materials/Material.hpp"
-#include "../../Box.hpp"
+#include "../../world/Box.hpp"
 
 
 class Triangle: public Primitive {

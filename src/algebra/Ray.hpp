@@ -1,35 +1,27 @@
-#ifndef ALGEBRA_RAY_H_
-#define ALGEBRA_RAY_H_
+#ifndef __ALGEBRA_RAY_H__
+#define __ALGEBRA_RAY_H__
 
-#include <cmath>
-#include <limits>
-
-#include "Color.hpp"
 #include "Point.hpp"
-#include "Vector.hpp"
 
-class Primitive;
+struct Primitive;
 
 
 struct Hit {
-	std::shared_ptr<Primitive> primitive;
+
+	Primitive* primitive;
 	float t;
+	
 };
 
 
-class Ray {
-
-public:
+struct Ray {
 
 	Point p;
 	Vector v;
 
-	Ray() {}
-	Ray(Point p, Vector v): p(p), v(v) {}
+	Ray(Point const& p, Vector const& v);
 
-	inline Point at(float const& t) const {
-		return p + t*v;
-	}
+	Point at(float const t) const;
 
 };
 

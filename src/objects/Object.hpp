@@ -1,18 +1,14 @@
-#ifndef OBJECTS_OBJECT_H_
-#define OBJECTS_OBJECT_H_
+#ifndef __OBJECTS_OBJECT_H__
+#define __OBJECTS_OBJECT_H__
 
 #include <vector>
 
-class Primitive;
+struct Primitive;
 
 
-class Object {
+struct Object {
 
-public:
-
-	virtual std::vector<std::shared_ptr<Primitive>> getPrimitives() const {
-		return std::vector<std::shared_ptr<Primitive>>();
-	}
+	virtual std::vector<Primitive*> getPrimitives() = 0;
 
 };
 

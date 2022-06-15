@@ -1,16 +1,13 @@
-#ifndef MATERIALS_MATERIAL_H_
-#define MATERIALS_MATERIAL_H_
+#ifndef __MATERIALS_MATERIAL_H__
+#define __MATERIALS_MATERIAL_H__
 
-#include "../algebra/Light.hpp"
-#include "../algebra/Point.hpp"
 #include "../objects/primitives/Primitive.hpp"
+#include "../world/World.hpp"
 
 
-class Material {
+struct Material {
 
-public:
-
-	virtual Light color(RelativePosition const& relative, FaceDirection const& faceDirection, Ray const& in, World const& world, int const& remaningRays, int const& maxDepth) const = 0;
+	virtual Light color(World const& world, Ray const& in, RelativePosition const& position, int const samples, int const depth) const = 0;
 
 };
 

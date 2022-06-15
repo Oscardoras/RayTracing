@@ -1,8 +1,8 @@
-#ifndef IMAGES_PERLIN_H_
-#define IMAGES_PERLIN_H_
+#ifndef __IMAGES_PERLIN_H__
+#define __IMAGES_PERLIN_H__
 
-#include <cmath>
-#include "../MathUtils.cpp"
+#include "../MathUtils.hpp"
+
 #include "../algebra/Point.hpp"
 
 

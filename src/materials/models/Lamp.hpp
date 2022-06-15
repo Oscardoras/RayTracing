@@ -1,21 +1,18 @@
-#ifndef MATERIALS_LAMP_H_
-#define MATERIALS_LAMP_H_
+#ifndef __MATERIALS__MODELS_LAMP_H__
+#define __MATERIALS__MODELS_LAMP_H__
 
 #include "../Material.hpp"
-#include "../../World.hpp"
+
+#include "../../textures/Texture.hpp"
 
 
-class Lamp: public virtual Material {
+struct Lamp: public virtual Material {
 
-public:
+	Texture* emitted;
 
-	std::shared_ptr<Texture> emitted;
+	Lamp(Texture* const emitted);
 
-	Lamp(std::shared_ptr<Texture> emitted) : Material(), emitted(emitted) {}
-
-	virtual Light color(RelativePosition const& relative, FaceDirection const& faceDirection, Ray const& in, World const& world, int const& samples, int const& maxDepth) const override {
-		return Light(emitted->getSpectrum(relative));
-	}
+	virtual Light color(World const& world, Ray const& in, RelativePosition const& position, int const samples, int const depth) const override;
 
 };
 

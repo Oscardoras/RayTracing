@@ -1,125 +1,58 @@
-#ifndef ALGEBRA_VECTOR_H_
-#define ALGEBRA_VECTOR_H_
+#ifndef __ALGEBRA_VECTOR_H__
+#define __ALGEBRA_VECTOR_H__
 
-#include <cmath>
-
-#include "../MathUtils.cpp"
-class Color;
+struct Color;
+struct Spectrum;
 
 
-class Vector {
-
-public:
+struct Vector {
 
 	float x;
 	float y;
 	float z;
 
-	Vector(): x(0), y(0), z(0) {}
-	Vector(float x, float y, float z): x(x), y(y), z(z) {}
+	Vector();
+	Vector(float const x, float const y, float const z);
 
-	inline Vector& operator+=(Vector const& v) {
-		x += v.x;
-		y += v.y;
-		z += v.z;
-		return *this;
-	}
+	Vector& operator+=(Vector const& v);
 
-	inline Vector& operator-=(Vector const& v) {
-		x -= v.x;
-		y -= v.y;
-		z -= v.z;
-		return *this;
-	}
+	Vector& operator-=(Vector const& v);
 
-	inline Vector& operator*=(float const& t) {
-		x *= t;
-		y *= t;
-		z *= t;
-		return *this;
-	}
+	Vector& operator*=(float const t);
 
-	inline Vector& operator/=(float const& t) {
-		x /= t;
-		y /= t;
-		z /= t;
-		return *this;
-	}
+	Vector& operator/=(float const t);
 
-	inline float lengthSquared() const {
-		return x*x + y*y + z*z;
-	}
+	float lengthSquared() const;
 
-	inline float length() const {
-		return sqrt(lengthSquared());
-	}
+	float length() const;
 
-	inline Vector unit() const {
-		float l = length();
-		return Vector(x / l, y / l, z / l);
-	}
+	Vector unit() const;
 
-	inline Color toColor() const;
+	Color toColor() const;
 
-	inline static Vector random() {
-		return Vector(random_double(-1, 1), random_double(-1, 1), random_double(-1, 1));
-	}
+	Spectrum toSpectrum() const;
 
-	inline static Vector randomUnit() {
-		Vector v = Vector::random();
-		float l = 0.5 * (1 + v.lengthSquared());
-		return Vector(v.x / l, v.y / l, v.z / l);
-	}
+	static Vector random();
+
+	static Vector randomUnit();
 
 };
 
-inline Vector operator+(Vector const& u, Vector const& v) {
-	return Vector(u.x + v.x, u.y + v.y, u.z + v.z);
-}
+Vector operator+(Vector const& u, Vector const& v);
 
-inline Vector operator-(Vector const& u, Vector const& v) {
-	return Vector(u.x - v.x, u.y - v.y, u.z - v.z);
-}
+Vector operator-(Vector const& u, Vector const& v);
 
-inline Vector operator*(float const& t, Vector const& u) {
-	return Vector(t * u.x, t * u.y, t * u.z);
-}
+Vector operator*(float const t, Vector const& u);
 
-inline Vector operator*(Vector const& u, float const& t) {
-	return t * u;
-}
+Vector operator*(Vector const& u, float const t);
 
-inline Vector operator-(Vector const& v) {
-	return -1*v;
-}
+Vector operator-(Vector const& v);
 
-inline float operator*(Vector const& u, Vector const& v) {
-    return u.x * v.x + u.y * v.y + u.z * v.z;
-}
+float operator*(Vector const& u, Vector const& v);
 
-inline Vector cross(Vector const& u, Vector const& v) {
-    return Vector(u.y * v.z - u.z * v.y, u.z * v.x - u.x * v.z, u.x * v.y - u.y * v.x);
-}
+Vector cross(Vector const& u, Vector const& v);
 
-inline Vector operator/(Vector const& u, float const& t) {
-	return (1/t) * u;
-}
-
-
-class Transformation {
-
-public:
-
-	std::shared_ptr<Transformation> transformation;
-
-	Transformation(std::shared_ptr<Transformation> transformation = nullptr): transformation(transformation) {}
-
-	virtual Vector transform(Vector const& vector) const {
-		if (transformation == nullptr) return vector;
-		else return transformation->transform(vector);
-	}
-
-};
+Vector operator/(Vector const& u, float const t);
 
 
 #endif

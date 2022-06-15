@@ -1,109 +1,57 @@
-#ifndef ALGEBRA_LIGHT_H_
-#define ALGEBRA_LIGHT_H_
+#ifndef __ALGEBRA_LIGHT_H__
+#define __ALGEBRA_LIGHT_H__
 
-#include <unordered_map>
-#include <tuple>
+#include <vector>
 
 #include "Spectrum.hpp"
 
 
-class Smooth {
-
-public:
+struct Smooth {
 
 	int id;
 	int radius;
-	Spectrum albedo;
-	Spectrum light;
+	Spectrum smoothing;
+	Spectrum accurate;
 
-	Smooth(int const& id, int const& radius, Spectrum const& albedo, Spectrum const& light): id(id), radius(radius), albedo(albedo), light(light) {}
-
-};
-
-
-class Light {
-
-public:
-
-	std::vector<Smooth> smoothing;
-
-	Light() {}
-	Light(int id, int radius, Spectrum albedo, Spectrum light) {
-		smoothing.push_back(Smooth(id, radius, albedo, light));
-	}
-	Light(Smooth const& smooth) {
-		smoothing.push_back(smooth);
-	}
-	Light(Spectrum const& spectrum) {
-		smoothing.push_back(Smooth(0, 0, Spectrum(1,1,1), spectrum));
-	}
-
-	inline Light& operator+=(Light const& l) {
-		for (Smooth smooth : l.smoothing) smoothing.push_back(smooth);
-		return *this;
-	}
-
-	inline Light& operator*=(float const& t) {
-		for (Smooth &smooth : smoothing) smooth.albedo *= t;
-		return *this;
-	}
-
-	inline Light& operator*=(Spectrum const& s) {
-		for (Smooth &smooth : smoothing) smooth.albedo *= s;
-		return *this;
-	}
-
-	inline Light& operator/=(float const& t) {
-		operator*=(1/t);
-		return *this;
-	}
-
-	inline Light& addId(int const& id) {
-		for (Smooth &smooth : smoothing) {
-			smooth.id += id;
-			smooth.id /= 2;
-		}
-		return *this;
-	}
-
-	inline Spectrum compute() const {
-		Spectrum value = Spectrum();
-		for (Smooth smooth : smoothing) value += smooth.albedo * smooth.light;
-		return value;
-	}
+	Smooth(int const id, int const radius, Spectrum const& smoothing, Spectrum const& accurate);
 
 };
 
-inline Light operator+(Light const& l1, Light const& l2) {
-	Light light = Light();
-	light += l1;
-	light += l2;
-	return light;
-}
 
-inline Light operator*(float const& t, Light const& l) {
-	Light light(l);
-	light *= t;
-	return light;
-}
+struct Light {
 
-inline Light operator*(Light const& l, float const& t) {
-	return t * l;
-}
+	std::vector<Smooth> smoothings;
 
-inline Light operator*(Light const& l, Spectrum const& s) {
-	Light light(l);
-	light *= s;
-	return light;
-}
+	Light();
+	Light(int const id, int const radius, Spectrum const& albedo, Spectrum const& light);
+	Light(Smooth const& smooth);
+	Light(Spectrum const& spectrum);
 
-inline Light operator*(Spectrum const& s, Light const& l) {
-	return l * s;
-}
+	Light& operator+=(Light const& l);
 
-inline Light operator/(Light const& l, float const& t) {
-	return l * (1/t);
-}
+	Light& operator*=(float const t);
+
+	Light& operator*=(Spectrum const& s);
+
+	Light& operator/=(float const t);
+
+	Light& addId(int const id);
+
+	Spectrum compute() const;
+
+};
+
+Light operator+(Light const& l1, Light const& l2);
+
+Light operator*(float const t, Light const& l);
+
+Light operator*(Light const& l, float const t);
+
+Light operator*(Light const& l, Spectrum const& s);
+
+Light operator*(Spectrum const& s, Light const& l);
+
+Light operator/(Light const& l, float const t);
 
 
 #endif

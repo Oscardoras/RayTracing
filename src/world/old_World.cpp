@@ -1,5 +1,5 @@
-#ifndef WORLD_H_
-#define WORLD_H_
+#ifndef OLDWORLD_H_
+#define OLDWORLD_H_
 
 #include <limits>
 #include <memory>
@@ -13,32 +13,6 @@
 
 
 class World {
-
-public:
-
-	std::vector<std::shared_ptr<Primitive>> primitives;
-	std::shared_ptr<Box> tree;
-
-	virtual Spectrum infiniteSpectrum(Ray const& r) const = 0;
-
-	virtual Spectrum maxDepthSpectrum(Ray const& r) const = 0;
-
-	void isEmpty() {
-		primitives.empty();
-	}
-
-	void add(std::shared_ptr<Object> object) {
-		std::shared_ptr<Primitive> primitive = std::dynamic_pointer_cast<Primitive>(object);
-		if (primitive != nullptr) primitives.push_back(primitive);
-		else {
-			for (std::shared_ptr<Primitive> const& primitive : object->getPrimitives())
-				primitives.push_back(primitive);
-		}
-	}
-
-	void clear() {
-		primitives.clear();
-	}
 
 protected:
 
@@ -114,15 +88,15 @@ public:
 		tree = sort(boxes, s);
 	}
 
-	Hit hit(Ray const& ray, bool const& inside) const {
+	Hit hit(Ray const& ray, bool inside) const {
 		nbr++;
-		return tree->hit(ray, 0.001, Infinite, inside);
+		return tree->hit(ray, 0.001, Infinity, inside);
 	}
 
-	Light trace(Ray const& ray, bool const& inside, int const& samples, int const& maxDepth) const {
-		if (maxDepth > 0) {
+	Light trace(Ray const& ray, bool inside, int samples, int depth) const {
+		if (depth > 0) {
 			Hit hit = this->hit(ray, inside);
-			if (!std::isnan(hit.t)) return hit.primitive->color(Ray(ray.at(hit.t), ray.v), *this, samples, maxDepth-1);
+			if (!std::isnan(hit.t)) return hit.primitive->color(Ray(ray.at(hit.t), ray.v), *this, samples, depth-1);
 			else return Light(infiniteSpectrum(ray));
 		} else return Light(maxDepthSpectrum(ray));
 	}

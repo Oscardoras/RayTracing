@@ -1,117 +1,56 @@
-#ifndef ALGEBRA_COLOR_H_
-#define ALGEBRA_COLOR_H_
+#ifndef __ALGEBRA_COLOR_H__
+#define __ALGEBRA_COLOR_H__
 
-#include "../MathUtils.cpp"
-#include "Vector.hpp"
-class Spectrum;
+#include <vector>
+
+struct Spectrum;
+struct Vector;
 
 
-class Color {
-
-public:
+struct Color {
 
 	float r;
 	float g;
 	float b;
 
-	Color(): r(0), g(0), b(0) {}
-	Color(float r, float g, float b): r(r), g(g), b(b) {}
+	Color();
+	Color(float const r, float const g, float const b);
 
-	inline Color& operator+=(Color const& c) {
-		r += c.r;
-		g += c.g;
-		b += c.b;
-		return *this;
-	}
+	Color& operator+=(Color const& c);
 
-	inline Color& operator-=(Color const& c) {
-		r -= c.r;
-		g -= c.g;
-		b -= c.b;
-		return *this;
-	}
+	Color& operator-=(Color const& c);
 
-	inline Color& operator*=(float const& t) {
-		r *= t;
-		g *= t;
-		b *= t;
-		return *this;
-	}
+	Color& operator*=(float const t);
 
-	inline Color& operator*=(Color const& c) {
-		r *= c.r;
-		g *= c.g;
-		b *= c.b;
-		return *this;
-	}
+	Color& operator*=(Color const& c);
 
-	inline Color& operator/=(float const& t) {
-		r /= t;
-		g /= t;
-		b /= t;
-		return *this;
-	}
+	Color& operator/=(float const t);
 
-	inline float toBlackAndWhite() const {
-		return (r+g+b)/3;
-	}
+	float toBlackAndWhite() const;
 
-	inline Spectrum toSpectrum() const;
+	Spectrum toSpectrum() const;
 
-	inline Vector toVector() const {
-		return Vector(r, g, b);
-	}
+	Vector toVector() const;
 
-	inline static Color white() {
-		return Color(1,1,1);
-	}
+	static Color white();
+
+	static Color median(std::vector<Color> & colors);
 
 };
 
-inline Color operator+(Color const& c, Color const& d) {
-	return Color(c.r + d.r, c.g + d.g, c.b + d.b);
-}
+Color operator+(Color const& c, Color const& d);
 
-inline Color operator-(Color const& c, Color const& d) {
-	return Color(c.r - d.r, c.g - d.g, c.b - d.b);
-}
+Color operator-(Color const& c, Color const& d);
 
-inline Color operator*(float const& t, Color const& c) {
-	return Color(t * c.r, t * c.g, t * c.b);
-}
+Color operator*(float const t, Color const& c);
 
-inline Color operator*(Color const& c, float const& t) {
-	return t * c;
-}
+Color operator*(Color const& c, float const t);
 
-inline Color operator-(Color const& c) {
-	return -1 * c;
-}
+Color operator-(Color const& c);
 
-inline Color operator*(Color const& c, Color const& d) {
-	return Color(c.r * d.r, c.g * d.g, c.b * d.b);
-}
+Color operator*(Color const& c, Color const& d);
 
-inline Color operator/(Color const& c, float const& t) {
-	return c * (1/t);
-}
-
-Color med(std::vector<Color> &array) {
-	std::vector<float> vr;
-	std::vector<float> vg;
-	std::vector<float> vb;
-	for (Color color : array) {
-		vr.push_back(color.r);
-		vg.push_back(color.g);
-		vb.push_back(color.b);
-	}
-	return Color(med(vr), med(vg), med(vb));
-}
-
-
-inline Color Vector::toColor() const {
-	return Color(x, y, z);
-}
+Color operator/(Color const& c, float const t);
 
 
 #endif

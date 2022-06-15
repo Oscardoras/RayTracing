@@ -1,33 +1,20 @@
-#ifndef TEXTURES_PLAIN_H_
-#define TEXTURES_PLAIN_H_
-
-#include <memory>
-#include <algorithm>
+#ifndef __TEXTURES_PLAIN_H__
+#define __TEXTURES_PLAIN_H__
 
 #include "Texture.hpp"
 
 
-class Plain: public Texture {
-
-public:
+struct Plain: public Texture {
 
 	Spectrum spectrum;
 
-	Plain(Spectrum spectrum): Texture(), spectrum(spectrum) {}
-	Plain(float r, float g, float b): Texture(), spectrum(r, g, b) {}
-	Plain(float f): Texture(), spectrum(f,f,f) {}
+	Plain(Spectrum const& spectrum);
+	Plain(float const r, float const g, float const b);
+	Plain(float const f);
 
-	virtual Spectrum getSpectrum(RelativePosition const& relative) const override {
-		return spectrum;
-	}
-
-	virtual Vector getVector(RelativePosition const& relative) const override {
-		return spectrum.toColor().toVector();
-	}
-
-	virtual float getFloat(RelativePosition const& relative) const override {
-		return spectrum.getIntensity();
-	}
+	virtual Spectrum getSpectrum(RelativePosition const& relative) const override;
+	virtual Vector getVector(RelativePosition const& relative) const override;
+	virtual float getFloat(RelativePosition const& relative) const override;
 
 };
 

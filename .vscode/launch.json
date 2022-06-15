@@ -8,7 +8,7 @@
             "name": "g++ - Générer et déboguer le programme",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/prog",
+            "program": "${workspaceFolder}/prog",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

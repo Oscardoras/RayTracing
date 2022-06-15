@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "../../OpticsUtils.cpp"
+#include "../../MathUtils.hpp"
 #include "../Material.hpp"
 #include "../../World.hpp"
 #include "../../textures/Texture.hpp"
