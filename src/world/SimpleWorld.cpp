@@ -3,7 +3,7 @@
 #include "../MathUtils.hpp"
 	
 	
-Hit SimpleWorld::hit(Ray const& ray, bool inside) const {
+Hit SimpleWorld::hit(Ray const& ray, bool const inside) const {
 	if (nbr != nullptr) (*nbr)++;
 	Hit hit;
 	hit.t = Infinity;
@@ -20,7 +20,7 @@ Hit SimpleWorld::hit(Ray const& ray, bool inside) const {
 	return hit;
 }
 
-Light SimpleWorld::trace(Ray const& ray, bool inside, int samples, int depth) const {
+Light SimpleWorld::trace(Ray const& ray, bool const inside, int const samples, int const depth) const {
 	if (depth > 0) {
 		Hit hit = this->hit(ray, inside);
 		if (!std::isnan(hit.t)) {

@@ -46,7 +46,7 @@ int main() {
 	camera.setPosition(Point(0,0,0), Vector(1,0,0), Vector(0,1,0));
 
 	std::time_t t0 = std::time(nullptr);
-	auto image = camera.render(4, 0.8, 10, 50);
+	auto image = camera.render(1, 0.8, 10, 50);
 	std::cout << level.nbr << " in " << std::time(nullptr) - t0 << " seconds." << std::endl;
 
 	image = image.gaussian(5, 0.8);

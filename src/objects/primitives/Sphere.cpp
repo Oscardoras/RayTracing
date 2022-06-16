@@ -31,7 +31,8 @@ float Sphere::hit(Ray const& r, float const tMin, float const tMax, bool const i
 
 Light Sphere::color(World const& world, Ray const& in, int const samples, int const depth) const {
 	Vector oc = in.p - center;
-	if (oc.lengthSquared() + 0.01 < radius*radius) return material->color(world, in, RelativePosition(oc, NaN, NaN, Vector(), Vector(), oc.unit()), samples, depth);
+	if (oc.lengthSquared() + 0.01 < radius*radius)
+		return material->color(world, in, RelativePosition(oc, NaN, NaN, Vector(), Vector(), oc.unit()), samples, depth);
 
 	float xz_radius = Vector(oc.x, 0, oc.z).length();
 	float theta = std::acos(oc.x / xz_radius);
