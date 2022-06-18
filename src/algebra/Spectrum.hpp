@@ -1,8 +1,7 @@
 #ifndef __ALGEBRA_SPECTRUM_H__
 #define __ALGEBRA_SPECTRUM_H__
 
-struct Color;
-struct Vector;
+#include "Color.hpp"
 
 
 struct Spectrum {
@@ -11,48 +10,111 @@ struct Spectrum {
 	float g;
 	float b;
 
-	Spectrum();
-	Spectrum(float const r, float const g, float const b);
+	inline Spectrum(): r(0), g(0), b(0) {}
+	inline Spectrum(float const r, float const g, float const b): r(r), g(g), b(b) {}
 
-	Spectrum& operator+=(Spectrum const& c);
+	inline Spectrum& operator+=(Spectrum const& c) {
+		r += c.r;
+		g += c.g;
+		b += c.b;
+		return *this;
+	}
 
-	Spectrum& operator-=(Spectrum const& c);
+	inline Spectrum& operator-=(Spectrum const& c) {
+		r -= c.r;
+		g -= c.g;
+		b -= c.b;
+		return *this;
+	}
 
-	Spectrum& operator*=(float const t);
+	inline Spectrum& operator*=(float const t) {
+		r *= t;
+		g *= t;
+		b *= t;
+		return *this;
+	}
 
-	Spectrum& operator*=(Spectrum const& c);
+	inline Spectrum& operator*=(Spectrum const& c) {
+		r *= c.r;
+		g *= c.g;
+		b *= c.b;
+		return *this;
+	}
 
-	Spectrum& operator/=(float const t);
+	inline Spectrum& operator/=(float const t) {
+		operator*=(1/t);
+		return *this;
+	}
 
-	Spectrum& operator/=(Spectrum const& c);
+	inline Spectrum& operator/=(Spectrum const& c) {
+		r /= c.r;
+		g /= c.g;
+		b /= c.b;
+		return *this;
+	}
 
-	float getIntensity() const;
+	inline float getIntensity() const {
+		return (r+g+b)/3;
+	}
 
-	bool isNull() const;
+	inline bool isNull() const {
+		return r <= 0. && g <= 0. && b <= 0.;
+	}
 
-	Color toColor() const;
+	inline Color toColor() const {
+		return Color(r, g, b);
+	}
 
-	Vector toVector() const;
+	inline Vector toVector() const {
+		return toColor().toVector();
+	}
 
-	static Spectrum white();
+	inline static Spectrum white() {
+		return Spectrum(1,1,1);
+	}
 
 };
 
-Spectrum operator+(Spectrum const& c, Spectrum const& d);
+inline Spectrum operator+(Spectrum const& c, Spectrum const& d) {
+	return Spectrum(c.r + d.r, c.g + d.g, c.b + d.b);
+}
 
-Spectrum operator-(Spectrum const& c, Spectrum const& d);
+inline Spectrum operator-(Spectrum const& c, Spectrum const& d) {
+	return Spectrum(c.r - d.r, c.g - d.g, c.b - d.b);
+}
 
-Spectrum operator*(float const t, Spectrum const& c);
+inline Spectrum operator*(float const t, Spectrum const& c) {
+	return Spectrum(t * c.r, t * c.g, t * c.b);
+}
 
-Spectrum operator-(Spectrum const& s);
+inline Spectrum operator-(Spectrum const& s) {
+	return -1 * s;
+}
 
-Spectrum operator*(Spectrum const& c, float const t);
+inline Spectrum operator*(Spectrum const& c, float const t) {
+	return t * c;
+}
 
-Spectrum operator*(Spectrum const& c, Spectrum const& d);
+inline Spectrum operator*(Spectrum const& c, Spectrum const& d) {
+	return Spectrum(c.r * d.r, c.g * d.g, c.b * d.b);
+}
 
-Spectrum operator/(Spectrum const& c, float const t);
+inline Spectrum operator/(Spectrum const& c, float const t) {
+	return c * (1/t);
+}
 
-Spectrum operator/(Spectrum const& c, Spectrum const& d);
+inline Spectrum operator/(Spectrum const& c, Spectrum const& d) {
+	return Spectrum(c.r / d.r, c.g / d.g, c.b / d.b);
+}
+
+
+inline Spectrum Vector::toSpectrum() const {
+	return Spectrum(x, y, z);
+}
+
+inline Spectrum Color::toSpectrum() const {
+	return Spectrum(r, g, b);
+}
 
 
 #endif

@@ -1,6 +1,7 @@
 #ifndef __WORLDS_SIMPLE_WORLD_H__
 #define __WORLDS_SIMPLE_WORLD_H__
 
+#include <memory>
 #include <vector>
 
 #include "../objects/primitives/Primitive.hpp"
@@ -13,7 +14,9 @@ class SimpleWorld: public World {
 public:
 
 	std::vector<Object*> objects;
-	long* nbr = nullptr;
+	std::unique_ptr<long> nbr;
+
+	SimpleWorld();
 
 	virtual Spectrum infiniteSpectrum(Ray const& r) const = 0;
 	virtual Spectrum maxDepthSpectrum(Ray const& r) const = 0;

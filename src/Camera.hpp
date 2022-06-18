@@ -25,8 +25,8 @@ public:
 
 protected:
 
-	static void threadRender(std::vector<Smooth> **smoothing, int width, int height, int from, int to, World * world, Point const position, Point corner, Vector horizontal, Vector vertical, int samples, int depth);
-	static void threadGaussian(std::vector<Smooth> **smoothing, Image * image, int from, int to, float g, float sigma);
+	static void threadRender(Light **lights, int width, int height, int from, int to, World * world, Point const position, Point corner, Vector horizontal, Vector vertical, int samples, int depth);
+	static void threadGaussian(Light **lights, Image * image, int from, int to, float g, float sigma);
 
 };
 

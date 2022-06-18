@@ -19,9 +19,11 @@ struct Ray {
 	Point p;
 	Vector v;
 
-	Ray(Point const& p, Vector const& v);
+	inline Ray(Point const& p, Vector const& v): p(p), v(v) {}
 
-	Point at(float const t) const;
+	inline Point at(float const t) const {
+		return p + t*v;
+	}
 
 };
 

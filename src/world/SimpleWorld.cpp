@@ -1,7 +1,9 @@
 #include "SimpleWorld.hpp"
 
 #include "../MathUtils.hpp"
-	
+
+
+SimpleWorld::SimpleWorld(): nbr(std::unique_ptr<long>(new long)) {}
 	
 Hit SimpleWorld::hit(Ray const& ray, bool const inside) const {
 	if (nbr != nullptr) (*nbr)++;
@@ -24,8 +26,7 @@ Light SimpleWorld::trace(Ray const& ray, bool const inside, int const samples, i
 	if (depth > 0) {
 		Hit hit = this->hit(ray, inside);
 		if (!std::isnan(hit.t)) {
-			Ray ray = Ray(ray.at(hit.t), ray.v);
-			return hit.primitive->color(*this, ray, samples, depth-1);
+			return hit.primitive->color(*this, Ray(ray.at(hit.t), ray.v.unit()), samples, depth-1);
 		} else return Light(infiniteSpectrum(ray));
 	} else return Light(maxDepthSpectrum(ray));
 }

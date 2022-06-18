@@ -1,8 +1,6 @@
 #ifndef __TEXTURES_TEXTURE_H__
 #define __TEXTURES_TEXTURE_H__
 
-#include "../algebra/Vector.hpp"
-#include "../algebra/Spectrum.hpp"
 #include "../objects/primitives/Primitive.hpp"
 
 

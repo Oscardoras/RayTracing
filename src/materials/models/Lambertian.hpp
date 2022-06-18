@@ -6,13 +6,19 @@
 #include "../../textures/Texture.hpp"
 
 
-struct Lambertian: public Material {
+class Lambertian: public Material {
+
+protected:
 
 	Texture* diffuse;
+
+public:
 
 	Lambertian(Texture* const diffuse);
 	
 	virtual Light color(World const& world, Ray const& in, RelativePosition const& position, int const samples, int const depth) const override;
+
+protected:
 
 	Spectrum scatter(World const& world, Ray const& in, RelativePosition const& position, int const samples, int const depth) const;
 

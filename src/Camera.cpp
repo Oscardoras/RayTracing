@@ -25,16 +25,16 @@ Image Camera::render(int const threads, float const sigma, int const samples, in
 
 	Image image(width, height);
 
-	std::vector<Smooth> **smoothing = new std::vector<Smooth> *[height];
+	Light **lights = new Light *[height];
 	for(int j = 0; j < height; j++)
-		smoothing[j] = new std::vector<Smooth>[width];
+		lights[j] = new Light[width];
 
 	
 	std::vector<std::thread> threads1;
 	int h = (height / threads)+1;
 	for (int i = 0; i < threads; i++) {
-		threads1.push_back(std::thread(Camera::threadRender, smoothing, width, height, i*h, std::min((i+1)*h, height), world, position, corner, horizontal, vertical, samples, depth));
-		//Camera::threadRender(smoothing, width, height, i*h, std::min(i*(h+1), height), world, position, corner, horizontal, vertical, samples, depth);
+		threads1.push_back(std::thread(Camera::threadRender, lights, width, height, i*h, std::min((i+1)*h, height), world, position, corner, horizontal, vertical, samples, depth));
+		//Camera::threadRender(lights, width, height, i*h, std::min(i*(h+1), height), world, position, corner, horizontal, vertical, samples, depth);
 	}
 	for (std::thread & thread : threads1)
 		thread.join();
@@ -42,21 +42,21 @@ Image Camera::render(int const threads, float const sigma, int const samples, in
 
 	std::vector<std::thread> threads2;
 	for (int i = 0; i < threads; i++) {
-		threads2.push_back(std::thread(Camera::threadGaussian, smoothing, &image, i*h, std::min((i+1)*h, height), g, sigma));
-		//Camera::threadGaussian(smoothing, &image, i*h, std::min(i*(h+1), height), g, sigma);
+		threads2.push_back(std::thread(Camera::threadGaussian, lights, &image, i*h, std::min((i+1)*h, height), g, sigma));
+		//Camera::threadGaussian(lights, &image, i*h, std::min(i*(h+1), height), g, sigma);
 	}
 	for (std::thread & thread : threads2)
 		thread.join();
 
 
 	for(int j = 0; j < height; j++)
-		delete[] smoothing[j];
-	delete[] smoothing;
+		delete[] lights[j];
+	delete[] lights;
 
 	return image;
 }
 
-void Camera::threadRender(std::vector<Smooth> **smoothing, int width, int height, int from, int to, World * world, Point const position, Point corner, Vector horizontal, Vector vertical, int samples, int depth) {
+void Camera::threadRender(Light **lights, int width, int height, int from, int to, World * world, Point const position, Point corner, Vector horizontal, Vector vertical, int samples, int depth) {
 	for (int y = from; y < to; y++) {
 		std::cout << "Rendering line : " << y << std::endl;
 
@@ -64,14 +64,12 @@ void Camera::threadRender(std::vector<Smooth> **smoothing, int width, int height
 			float u = float(x) / (width-1);
 			float v = float(y) / (height-1);
 			Ray r(position, corner + (1-u)*horizontal + v*vertical - position);
-			Light light = world->trace(r, true, samples, depth);
-			
-			smoothing[y][x] = light.smoothings;
+			lights[y][x] = world->trace(r, true, samples, depth);
 		}
 	}
 }
 
-void Camera::threadGaussian(std::vector<Smooth> **smoothing, Image * image, int from, int to, float g, float sigma) {
+void Camera::threadGaussian(Light **lights, Image * image, int from, int to, float g, float sigma) {
 	std::vector<Matrix> matrices;
 
 	for (int y = from; y < to; y++) {
@@ -80,18 +78,18 @@ void Camera::threadGaussian(std::vector<Smooth> **smoothing, Image * image, int 
 		for (int x = 0; x < image->width; x++) {
 			Color color;
 
-			for (Smooth & smooth : smoothing[y][x]) {
-				if (smooth.id != 0 & smooth.radius > 0) {
-					int r = (smooth.radius-1)/2;
+			for (auto & pair : lights[y][x].smoothings) {
+				if (pair.second.radius > 1) {
+					int r = (pair.second.radius-1)/2;
 
 					Matrix* matrix = nullptr;
-					for (Matrix & m : matrices) if (m.size == smooth.radius) {
+					for (Matrix & m : matrices) if (m.size == pair.second.radius) {
 						matrix = &m;
 						break;
 					}
 					if (matrix == nullptr) {
-						matrices.push_back(Matrix(smooth.radius));
-						float o = smooth.radius * sigma;
+						matrices.push_back(Matrix(pair.second.radius));
+						float o = r * sigma;
 						for (int j = -r; j <= r; j++)
 							for (int i = -r; i <= r; i++)
 								matrices.back().elements[j+r][i+r] = std::exp( -(i*i + j*j) / (2*o*o));
@@ -102,16 +100,18 @@ void Camera::threadGaussian(std::vector<Smooth> **smoothing, Image * image, int 
 					float sum = 0.;
 					for (int j = -r; j <= r; j++) if (y+j >= 0 && y+j <= image->height-1) {
 						for (int i = -r; i <= r; i++) if (x+i >= 0 && x+i <= image->width-1) {
-							for (Smooth &s : smoothing[y+j][x+i]) if (s.id == smooth.id) {
+							auto const& smoothings = lights[y+j][x+i].smoothings;
+							auto const& it = smoothings.find(pair.first);
+							if (it != smoothings.end()) {
 								float coef = matrix->elements[r+j][r+i];
 								sum += coef;
-								spectrum += coef*s.smoothing;
+								spectrum += coef*it->second.smooth;
 								break;
 							}
 						}
 					}
-					color += (smooth.accurate * spectrum/sum).toColor();
-				} else color = (smooth.accurate * smooth.accurate).toColor();
+					color += (pair.second.accurate * spectrum/sum).toColor();
+				} else color += (pair.second.accurate * pair.second.smooth).toColor();
 			}
 
 			color.r = pow(color.r, g);

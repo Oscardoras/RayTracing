@@ -6,9 +6,13 @@
 #include "../../textures/Texture.hpp"
 
 
-struct Lamp: public virtual Material {
+class Lamp: public virtual Material {
+
+protected:
 
 	Texture* emitted;
+
+public:
 
 	Lamp(Texture* const emitted);
 

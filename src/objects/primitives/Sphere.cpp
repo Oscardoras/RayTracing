@@ -37,7 +37,6 @@ Light Sphere::color(World const& world, Ray const& in, int const samples, int co
 	float xz_radius = Vector(oc.x, 0, oc.z).length();
 	float theta = std::acos(oc.x / xz_radius);
 	if (oc.z > 0) theta = -theta + 2*Pi;
-	//theta += orientation.yaw;
 	theta -= 2*Pi*int(theta/(2*Pi));
 
 	float phi = std::asin(oc.y / radius) + Pi/2;

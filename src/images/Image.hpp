@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../algebra/Color.hpp"
+#include "../algebra/Spectrum.hpp"
 
 
 struct Matrix {

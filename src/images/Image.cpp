@@ -150,9 +150,9 @@ bool Image::save(std::string const& path) const {
 		stream << "P3\n" << width << ' ' << height << "\n255\n";
 		for (int y = height-1; y >= 0; --y) for (int x = 0; x < width; ++x) {
 			Color c = pixels[y][x];
-			stream << static_cast<int>(255. * std::max(float(0), c.r)) << ' '
-			<< static_cast<int>(255. * std::max(float(0), c.g)) << ' '
-			<< static_cast<int>(255. * std::max(float(0), c.b)) << '\n';
+			stream << static_cast<int>(255. * std::max(0.f, c.r)) << ' '
+			<< static_cast<int>(255. * std::max(0.f, c.g)) << ' '
+			<< static_cast<int>(255. * std::max(0.f, c.b)) << '\n';
 		}
 		return true;
 	} else return false;
