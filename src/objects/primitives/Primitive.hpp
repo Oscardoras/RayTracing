@@ -20,23 +20,22 @@ struct RelativePosition {
 	Vector vDirection;
 	Vector normal;
 	
-	RelativePosition(Vector const& relative, float const u, float const v, Vector const& uDirection, Vector const& vDirection, Vector const& normal);
+	inline RelativePosition(Vector const& relative, float const u, float const v, Vector const& uDirection, Vector const& vDirection, Vector const& normal):
+		relative(relative), u(u), v(v), uDirection(uDirection), vDirection(vDirection), normal(normal) {}
 
 };
 
 
 struct Primitive: public Object {
 
-	virtual std::vector<Primitive*> getPrimitives() override;
+	inline virtual std::vector<Primitive*> getPrimitives() override {
+		return std::vector<Primitive*> {this};
+	}
 
 	virtual float hit(Ray const& r, float const tMin, float const tMax, bool const inside) const = 0;
 	virtual Light color(World const& world, Ray const& in, int const samples, int const depth) const = 0;
 
-/*
-	virtual ImageTexture* getTextureShape(Image* const& image) const = 0;
-	virtual Ray getSurface(int const u, int const v) const = 0;
-	virtual Box getBox() const = 0;
-*/
+	virtual Ray getNormalRay(int const u, int const v) const = 0;
 
 };
 

@@ -160,15 +160,15 @@ bool Image::save(std::string const& path) const {
 
 Image Image::filtre(Matrix const& m) const {
 	Image filtered(width, height);
-	int r = (m.size-1)/2;
+	int radius = (m.size-1)/2;
 
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			Color c;
 			for (int j = 0; j < m.size; j++) {
 				for (int i = 0; i < m.size; i++) {
-					if (y-r+j >= 0 && y-r+j <= height-1 && x-r+i >= 0 && x-r+i <= width-1) {
-						c += m.elements[j][i] * pixels[y-r+j][x-r+i];
+					if (y-radius+j >= 0 && y-radius+j <= height-1 && x-radius+i >= 0 && x-radius+i <= width-1) {
+						c += m.elements[j][i] * pixels[y-radius+j][x-radius+i];
 					}
 				}
 			}
@@ -183,16 +183,16 @@ Image Image::multiply(float const x) const {
 	return filtre(Matrix(1, x));
 }
 
-Image Image::blur(int const size) const {
+Image Image::blur(int const radius) const {
+	int size = 1+ 2*radius;
 	return filtre(Matrix(size, 1./(size*size)));
 }
 
-Image Image::gaussian(int const size, float const sigma) const {
-	Matrix m(size);
-	int r = (size-1)/2;
-	for (int y = -r; y <= r; y++)
-		for (int x = -r; x <= r; x++)
-			m.elements[x+r][y+r] = std::exp( -(x*x + y*y) / (2*sigma*sigma) ) / (2*Pi*sigma*sigma);
+Image Image::gaussian(int const radius, float const sigma) const {
+	Matrix m(1 + 2*radius);
+	for (int y = -radius; y <= radius; y++)
+		for (int x = -radius; x <= radius; x++)
+			m.elements[x+radius][y+radius] = std::exp( -(x*x + y*y) / (2*sigma*sigma) ) / (2*Pi*sigma*sigma);
 
 	return filtre(m);
 }

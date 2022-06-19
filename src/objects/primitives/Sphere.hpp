@@ -1,7 +1,6 @@
 #ifndef __OBJECTS_PRIMITIVES_SPHERE_H__
 #define __OBJECTS_PRIMITIVES_SPHERE_H__
 
-#include "../../algebra/Orientation.hpp"
 #include "../../materials/Material.hpp"
 
 
@@ -17,6 +16,10 @@ public:
 
 	virtual float hit(Ray const& r, float const tMin, float const tMax, bool const inside) const override;
 	virtual Light color(World const& world, Ray const& in, int const samples, int const depth) const override;
+
+	virtual Ray getNormalRay(int const u, int const v) const override;
+
+	virtual Box* getBox() const override;
 
 };
 

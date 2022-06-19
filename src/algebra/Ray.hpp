@@ -8,7 +8,7 @@ struct Primitive;
 
 struct Hit {
 
-	Primitive* primitive;
+	Primitive const * primitive;
 	float t;
 	
 };

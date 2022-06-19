@@ -38,8 +38,8 @@ struct Image {
 
 	Image filtre(Matrix const& m) const;
 	Image multiply(float const x) const;
-	Image blur(int const size) const;
-	Image gaussian(int const size, float const sigma) const;
+	Image blur(int const radius) const;
+	Image gaussian(int const radius, float const sigma) const;
 	Image contour_detection() const;
 	void maximize();
 

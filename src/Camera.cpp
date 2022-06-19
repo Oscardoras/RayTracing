@@ -78,41 +78,40 @@ void Camera::threadGaussian(Light **lights, Image * image, int from, int to, flo
 		for (int x = 0; x < image->width; x++) {
 			Color color;
 
-			for (auto & pair : lights[y][x].smoothings) {
-				if (pair.second.radius > 1) {
-					int r = (pair.second.radius-1)/2;
+			Light & light = lights[y][x];
+			if (light.id != 0 && light.radius > 0) {
+				int const radius = light.radius;
+				int const size = 1 + 2*light.radius;
 
-					Matrix* matrix = nullptr;
-					for (Matrix & m : matrices) if (m.size == pair.second.radius) {
-						matrix = &m;
-						break;
-					}
-					if (matrix == nullptr) {
-						matrices.push_back(Matrix(pair.second.radius));
-						float o = r * sigma;
-						for (int j = -r; j <= r; j++)
-							for (int i = -r; i <= r; i++)
-								matrices.back().elements[j+r][i+r] = std::exp( -(i*i + j*j) / (2*o*o));
-						matrix = &matrices.back();
-					}
+				Matrix* matrix = nullptr;
+				for (Matrix & m : matrices) if (m.size == size) {
+					matrix = &m;
+					break;
+				}
+				if (matrix == nullptr) {
+					matrices.push_back(Matrix(size));
+					float o = radius * sigma;
+					for (int j = -radius; j <= radius; j++)
+						for (int i = -radius; i <= radius; i++)
+							matrices.back().elements[j+radius][i+radius] = std::exp( -(i*i + j*j) / (2*o*o));
+					matrix = &matrices.back();
+				}
 
-					Spectrum spectrum;
-					float sum = 0.;
-					for (int j = -r; j <= r; j++) if (y+j >= 0 && y+j <= image->height-1) {
-						for (int i = -r; i <= r; i++) if (x+i >= 0 && x+i <= image->width-1) {
-							auto const& smoothings = lights[y+j][x+i].smoothings;
-							auto const& it = smoothings.find(pair.first);
-							if (it != smoothings.end()) {
-								float coef = matrix->elements[r+j][r+i];
-								sum += coef;
-								spectrum += coef*it->second.smooth;
-								break;
-							}
+				Spectrum spectrum;
+				float sum = 0.;
+				for (int j = -radius; j <= radius; j++) if (y+j >= 0 && y+j <= image->height-1) {
+					for (int i = -radius; i <= radius; i++) if (x+i >= 0 && x+i <= image->width-1) {
+						auto const& light2 = lights[y+j][x+i];
+						if (light2.id == light.id) {
+							float coef = matrix->elements[radius+j][radius+i];
+							sum += coef;
+							spectrum += coef*light2.smooth;
+							break;
 						}
 					}
-					color += (pair.second.accurate * spectrum/sum).toColor();
-				} else color += (pair.second.accurate * pair.second.smooth).toColor();
-			}
+				}
+				color += (light.accurate * spectrum/sum).toColor();
+			} else color += light.compute().toColor();
 
 			color.r = pow(color.r, g);
 			color.g = pow(color.g, g);

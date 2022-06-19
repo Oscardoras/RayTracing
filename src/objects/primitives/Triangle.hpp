@@ -1,86 +1,42 @@
-#ifndef OBJECTS_PRIMITIVES_TRIANGLE_H_
-#define OBJECTS_PRIMITIVES_TRIANGLE_H_
+#ifndef __OBJECTS_PRIMITIVES_TRIANGLE_H__
+#define __OBJECTS_PRIMITIVES_TRIANGLE_H__
 
-#include <memory>
-#include <algorithm>
-
-#include "Primitive.hpp"
 #include "../../materials/Material.hpp"
-#include "../../world/Box.hpp"
+
+
+struct Transformation {
+	
+	virtual Vector transform(Vector const& vector) const = 0;
+
+};
 
 
 class Triangle: public Primitive {
 
-public:
+protected:
 
 	Point A;
 	Point B;
 	Point C;
 	Vector V;
 	float d;
+	Vector AB_norm;
 	Vector AB_ort;
 	Vector BC_ort;
 	Vector CA_ort;
-	std::shared_ptr<Transformation> transformation;
-	std::shared_ptr<Material> material;
+	Material* material;
+	Transformation* transformation;
 
-	Triangle(Point A, Point B, Point C, std::shared_ptr<Material> material, std::shared_ptr<Transformation> transformation = std::make_shared<Transformation>()):
-		Primitive(), A(A), B(B), C(C), material(material), transformation(transformation) {
-		Vector AB = B-A;
-		Vector BC = C-B;
-		Vector CA = A-C;
-		V = cross(AB,BC).unit();
-		d = V*(A - Point());
-		Vector AB_norm = AB.unit();
-		Vector BC_norm = BC.unit();
-		Vector CA_norm = CA.unit();
-		AB_ort = ( BC_norm - (BC_norm*AB_norm)*AB_norm ).unit();
-		BC_ort = ( CA_norm - (CA_norm*BC_norm)*BC_norm ).unit();
-		CA_ort = ( AB_norm - (AB_norm*CA_norm)*CA_norm ).unit();
-	}
+public:
 
-	virtual float hit(Ray const& r, float const& tMin, float const& tMax, bool const& inside) const {
-		float l = V * r.v;
-		if (l != 0.) {
-			float t = (d - V * (r.p - Point())) / l;
-			if (tMin < t && t < tMax) {
-				Point p = r.at(t);
-				if ((p-A)*AB_ort > 0) {
-					if ((p-B)*BC_ort > 0) {
-						if ((p-C)*CA_ort > 0) {
-							return t;
-						}
-					}
-				}
-			}
-		}
+	Triangle(Point const& A, Point const& B, Point const& C, Material* const& material, Transformation* transformation = nullptr);
 
-		return NaN;
-	}
+	virtual float hit(Ray const& r, float const tMin, float const tMax, bool const inside) const override;
+	virtual Light color(World const& world, Ray const& in, int const samples, int const depth) const override;
 
-	virtual Light color(Ray const& in, World const& world, int const& remaningRays, int const& maxDepth) const override {
-		Vector vec = transformation->transform(in.p - A);
-		return material->color(RelativePosition(vec, vec*CA_ort, vec*AB_ort), FaceDirection(CA_ort, V*in.v < 0 ? V : -V), in, world, remaningRays, maxDepth);
-	}
+	virtual Ray getNormalRay(int const u, int const v) const override;
 
-	virtual std::shared_ptr<ImageTexture> getTextureShape(std::shared_ptr<Image> const& image) const override {
-		return std::make_shared<ImageTexture>(image, abs((B-A)*CA_ort), abs((C-A)*AB_ort));
-	}
-
-	virtual Ray getSurface(RelativePosition const& relative) const override {
-		return Ray(A + relative.u*CA_ort + relative.v*AB_ort, Vector());
-	}
-
-	virtual Box getBox() const override {
-		Box box = Box(Point(), Point());
-		box.M.x = std::max(std::max(A.x, B.x), C.x);
-		box.M.y = std::max(std::max(A.y, B.y), C.y);
-		box.M.z = std::max(std::max(A.z, B.z), C.z);
-		box.m.x = std::min(std::min(A.x, B.x), C.x);
-		box.m.y = std::min(std::min(A.y, B.y), C.y);
-		box.m.z = std::min(std::min(A.z, B.z), C.z);
-		return box;
-	}
+	virtual Box* getBox() const override;
 
 };
 

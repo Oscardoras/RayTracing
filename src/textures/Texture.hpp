@@ -12,13 +12,5 @@ struct Texture {
 
 };
 
-struct NullTexture: public Texture {
-
-	virtual Spectrum getSpectrum(RelativePosition const& relative) const override;
-	virtual Vector getVector(RelativePosition const& relative) const override;
-	virtual float getFloat(RelativePosition const& relative) const override;
-
-};
-
 
 #endif

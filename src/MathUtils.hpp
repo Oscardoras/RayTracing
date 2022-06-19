@@ -10,6 +10,11 @@ constexpr float Pi = 3.14;
 constexpr float NaN = std::numeric_limits<double>::signaling_NaN();
 constexpr float Infinity = std::numeric_limits<double>::infinity();
 
+inline int modulo(int const a, int const b) {
+    int m = a % b;
+    return m >= 0 ? m : m + b;
+}
+
 inline double random_double() {
     return rand() / (RAND_MAX + 1.0);
 }

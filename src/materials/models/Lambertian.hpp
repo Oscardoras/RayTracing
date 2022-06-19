@@ -14,7 +14,7 @@ protected:
 
 public:
 
-	Lambertian(Texture* const diffuse);
+	inline Lambertian(Texture* const diffuse): diffuse(diffuse) {}
 	
 	virtual Light color(World const& world, Ray const& in, RelativePosition const& position, int const samples, int const depth) const override;
 

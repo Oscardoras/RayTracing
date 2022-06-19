@@ -1,5 +1,7 @@
 #include "Sphere.hpp"
 
+#include "../../world/Box.hpp"
+
 #include "../../MathUtils.hpp"
 
 
@@ -45,14 +47,9 @@ Light Sphere::color(World const& world, Ray const& in, int const samples, int co
 	return material->color(world, in, RelativePosition(oc, theta*radius, phi*radius, Vector(1,0,0), Vector(0,1,0), oc.unit()), samples, depth);
 }
 
-/*
-virtual std::shared_ptr<ImageTexture> getTextureShape(std::shared_ptr<Image> const& image) const override {
-	return std::make_shared<ImageTexture>(image, 2*Pi*radius, Pi*radius);
-}
-
-virtual Ray getSurface(RelativePosition const& relative) const override {
-	float theta = (relative.u / radius) - orientation.yaw;
-	float phi = relative.v / radius;
+Ray Sphere::getNormalRay(int const u, int const v) const {
+	float theta = u / radius;
+	float phi = v / radius;
 
 	float sin = std::sin(phi - Pi/2);
 	float y = sin;
@@ -64,8 +61,8 @@ virtual Ray getSurface(RelativePosition const& relative) const override {
 	return Ray(p, (p - center).unit());
 }
 
-virtual Box getBox() const override {
-	Box box = Box(center + radius*Vector(1,1,1), center - radius*Vector(1,1,1));
+Box* Sphere::getBox() const {
+	Box* box = new Box(center + radius*Vector(1,1,1), center - radius*Vector(1,1,1));
+	box->primitives.push_back(this);
 	return box;
 }
-*/

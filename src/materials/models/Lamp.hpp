@@ -6,7 +6,7 @@
 #include "../../textures/Texture.hpp"
 
 
-class Lamp: public virtual Material {
+class Lamp: public Material {
 
 protected:
 

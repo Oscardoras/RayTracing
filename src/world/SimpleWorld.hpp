@@ -13,15 +13,15 @@ class SimpleWorld: public World {
 
 public:
 
-	std::vector<Object*> objects;
+	std::vector<Primitive const *> primitives;
 	std::unique_ptr<long> nbr;
 
-	SimpleWorld();
+	inline SimpleWorld(): nbr(std::unique_ptr<long>(new long)) {}
 
-	virtual Spectrum infiniteSpectrum(Ray const& r) const = 0;
-	virtual Spectrum maxDepthSpectrum(Ray const& r) const = 0;
+	virtual Light infiniteLight(Ray const& r) const = 0;
+	virtual Light maxDepthLight(Ray const& r) const = 0;
 
-	virtual Hit hit(Ray const& ray, bool const inside) const;
+	virtual Hit hit(Ray const& ray, bool const inside) const override;
 	virtual Light trace(Ray const& ray, bool const inside, int const samples, int const depth) const override;
 
 };
