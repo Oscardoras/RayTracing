@@ -51,7 +51,7 @@ struct Vector {
 	}
 
 	inline Vector unit() const {
-		float inv = 1/length();
+		float const inv = 1/length();
 		return Vector(x * inv, y * inv, z * inv);
 	}
 
@@ -61,7 +61,7 @@ struct Vector {
 
 	inline static Vector randomUnit() {
 		Vector v = Vector(random_double(-1, 1), random_double(-1, 1), random_double(-1, 1));
-		float l = 0.5 * (1 + v.lengthSquared());
+		float const l = 0.5 * (1 + v.lengthSquared());
 		return v /= l;
 	}
 

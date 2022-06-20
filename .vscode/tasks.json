@@ -6,7 +6,7 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-std=c++17",
-                "-g",
+                "-pg",
                 "-pthread",
                 "${workspaceFolder}/src/images/Image.cpp",
                 "${workspaceFolder}/src/materials/models/*.cpp",
